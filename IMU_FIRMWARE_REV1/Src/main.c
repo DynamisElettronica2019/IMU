@@ -43,16 +43,65 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <math.h>
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+/*Quaternion type. Used for conversion*/
+typedef struct
+{
+	float qw;
+	float qi;
+	float qj;
+	float qk;
+}quaternionType;
+
+/*Euler angle type. Units: Degrees*/
+typedef struct
+{
+	float roll;
+	float pitch;
+	float yaw;
+}eulerType;
+
+/*Struct used to store raw data from the sensor*/
+typedef struct
+{
+	/*Accelerometer uncompensated data. Units m/s^2. Q point = 8*/
+	int16_t accel_X;
+	int16_t accel_Y;
+	int16_t accel_Z;
+	
+	/*Accelerometer data compensated against gravity. Units m/s^2. Q point = 8*/
+	int16_t linear_X;
+	int16_t linear_Y;
+	int16_t linear_Z;
+	
+	/*Gyroscope angular rate data. Units rad/s. Q point = 9*/
+	int16_t angular_X;
+	int16_t angular_Y;
+	int16_t angular_Z;
+	
+	/*Quaternion rotation data. Order: i - j - k - real. Q point = 12 + accuracy, Q point 12 (units??).*/
+	int16_t quat_i;
+	int16_t quat_j;
+	int16_t quat_k;
+	int16_t quat_r;
+	int16_t accuracy;
+	
+}sensorRawReadType;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+/*THRESOLD for handling singularities in quaternion conversion*/
+#define THRESHOLD 0.499
+#define M_PI 3.14159265358979323846
 
 /* USER CODE END PD */
 
@@ -76,6 +125,9 @@ static void MX_GPIO_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
+
+eulerType quaternionToEuler (quaternionType quaternion);
+float radToDeg(float angle);
 
 /* USER CODE END PFP */
 
@@ -276,6 +328,56 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+eulerType quaternionToEuler (quaternionType quaternion)
+{
+	eulerType output;
+	float sqi,sqj,sqk;
+	float test;
+
+	test = quaternion.qi*quaternion.qj + quaternion.qk*quaternion.qw;
+
+	if (test > THRESHOLD) 
+	{
+		output.yaw = 2 * atan2(quaternion.qi,quaternion.qw);
+		output.pitch = M_PI/2;
+		output.roll = 0;
+		output.yaw = radToDeg(output.yaw);
+		output.pitch = radToDeg(output.pitch);
+		output.roll = radToDeg(output.roll);
+		return output;
+	}
+
+	if (test < -THRESHOLD)
+	{
+		output.yaw = -2 * atan2(quaternion.qi,quaternion.qw);
+		output.pitch = - M_PI/2;
+		output.roll = 0;
+		output.yaw = radToDeg(output.yaw);
+		output.pitch = radToDeg(output.pitch);
+		output.roll = radToDeg(output.roll);
+		return output;
+	}
+
+    sqi = quaternion.qi*quaternion.qi;
+    sqj = quaternion.qj*quaternion.qj;
+    sqk = quaternion.qk*quaternion.qk;
+
+    output.yaw = atan2(2*quaternion.qj*quaternion.qw-2*quaternion.qi*quaternion.qk , 1 - 2*sqj - 2*sqk);
+	output.pitch = asin(2*test);
+	output.roll = atan2(2*quaternion.qi*quaternion.qw-2*quaternion.qj*quaternion.qk , 1 - 2*sqi - 2*sqk);
+	output.yaw = radToDeg(output.yaw);
+	output.pitch = radToDeg(output.pitch);
+	output.roll = radToDeg(output.roll);
+	
+
+	return output;
+}
+
+float radToDeg(float angle)
+{
+	return ((angle/M_PI)*180.00);
+}
 
 /* USER CODE END 4 */
 
