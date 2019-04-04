@@ -102,6 +102,11 @@ typedef struct
 /*THRESOLD for handling singularities in quaternion conversion*/
 #define THRESHOLD 0.499
 #define M_PI 3.14159265358979323846
+#define SOFTWARE_VERSION 1
+#define IMU_ADDRESS (0x28 << 1) /*Alternative 0x29 (IMU PIN 17 HIGH), one left bit shift required for hal function*/ 
+#define IMU_TIMEOUT_BLK 6
+#define IMU_UNKNOWN_BLK 4
+
 
 /* USER CODE END PD */
 
@@ -143,7 +148,8 @@ float radToDeg(float angle);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	uint16_t led_cycles;
+	HAL_StatusTypeDef IMU_checksum;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -168,6 +174,49 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
+	/*LED_DEBUG_1 turns on: microcontroller powered and initialized successfully.*/
+	led_cycles=0;
+	while(led_cycles<SOFTWARE_VERSION)
+	{
+	HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
+	HAL_Delay(100);
+	HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
+	HAL_Delay(100);
+	led_cycles++;
+	}
+	HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
+	
+	/*IMU Initialization.*/
+	HAL_GPIO_TogglePin(GPIOC, nBOOT_IMU_Pin); /*Sets nBOOT pin. HIGH -> normal operation / LOW -> Bootloader*/
+	HAL_Delay(100);
+	HAL_GPIO_TogglePin(GPIOC, RESET_IMU_Pin); /*Drives HIGH the imu reset pin (ACTIVE LOW). Needs 800 ms delay after reset (BNO055 datasheet)*/
+	HAL_Delay(1000);
+	
+	/*IMU Checksum. LED_DEBUG_2 state: ON -> success / BLINK THREE TIMES -> timeout error / BLINK TWO TIMES -> unknown error*/
+	IMU_checksum = HAL_I2C_IsDeviceReady(&hi2c1,IMU_ADDRESS, 2, 10);
+	if (IMU_checksum==HAL_OK)
+	{
+		HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_2_Pin);
+	}
+	else if (IMU_checksum==HAL_TIMEOUT)
+	{
+		for (led_cycles=0;led_cycles<IMU_TIMEOUT_BLK;led_cycles++)
+		{
+			HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_2_Pin);
+			HAL_Delay(500);
+		}
+	}
+	else
+	{
+		for (led_cycles=0;led_cycles<IMU_UNKNOWN_BLK;led_cycles++)
+		{
+			HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_2_Pin);
+			HAL_Delay(500);
+		}
+	}
+	
+	
+			
   /* USER CODE END 2 */
 
   /* Infinite loop */
