@@ -26,6 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "BNO085.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,7 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define BNO085_ADDRESS 0x94
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,7 +68,8 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	uint8_t count=0;
+	BNO085 *myIMU;
   /* USER CODE END 1 */
   
 
@@ -92,8 +94,48 @@ int main(void)
   MX_I2C1_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
+				
+	HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);
+	
+	while (count<5)
+	{
+			HAL_Delay(100);
+			HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);	
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_SET);	
+			HAL_Delay(100);
+			HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_RESET);	
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);	
+			count++;	
+	}
+
+	myIMU=BNO085_CreateIMU(&hi2c1, BNO085_ADDRESS, GPIOC, RESET_IMU_Pin, GPIOC, nBOOT_IMU_Pin);
+	BNO085_HardReset(myIMU);
+	HAL_Delay(250);
+	
+	if (BNO085_IsAlive(myIMU)==0)
+	{
+		HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);
+	}
+	
+	HAL_Delay(50);
+	BNO085_FlushI2C(myIMU);
+	HAL_Delay(50);
+	BNO085_FlushI2C(myIMU);
+	HAL_Delay(50);
+
+	BNO085_EnableAccelerometer(myIMU,10);
+	BNO085_EnableGyroscope(myIMU,10);
+	BNO085_EnableLinearAcc(myIMU,10);
+	BNO085_EnableAbsoluteRotationVector(myIMU,10);
+	BNO085_EnableRelativeRotationVector(myIMU,10);
+	
 	canStart();
 	
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,7 +145,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		HAL_Delay(1000);
+		BNO085_UpdateSensorReading(myIMU);
 		canSendDebug();
   }
   /* USER CODE END 3 */

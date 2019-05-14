@@ -4,7 +4,6 @@
 #include "stdlib.h"
 #include <math.h>
 
-#define BNO085_ADDRESS 0x94
 #define BNO085_BUFFER_LENGTH 300
 
 #define CHANNEL_COMMAND	0
