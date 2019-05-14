@@ -1,6 +1,6 @@
 --cpu=Cortex-M4.fp
 "imu_firmware_rev1\startup_stm32f413xx.o"
-"imu_firmware_rev1\bno_085.o"
+"imu_firmware_rev1\bno085.o"
 "imu_firmware_rev1\main.o"
 "imu_firmware_rev1\gpio.o"
 "imu_firmware_rev1\can.o"
@@ -24,6 +24,7 @@
 "imu_firmware_rev1\stm32f4xx_hal_pwr_ex.o"
 "imu_firmware_rev1\stm32f4xx_hal_cortex.o"
 "imu_firmware_rev1\stm32f4xx_hal.o"
+"imu_firmware_rev1\stm32f4xx_hal_exti.o"
 "imu_firmware_rev1\system_stm32f4xx.o"
 --library_type=microlib --strict --scatter "IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols

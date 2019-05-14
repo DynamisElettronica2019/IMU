@@ -379,26 +379,19 @@
       <Groups>
         <Group>
           <GroupName>Application/MDK-ARM</GroupName>
+        </Group>
+        <Group>
+          <GroupName>Application/User</GroupName>
           <Files>
             <File>
               <FileName>startup_stm32f413xx.s</FileName>
               <FileType>2</FileType>
               <FilePath>startup_stm32f413xx.s</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Application/User</GroupName>
-          <Files>
             <File>
-              <FileName>BNO_085.c</FileName>
+              <FileName>BNO085.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\BNO_085.c</FilePath>
-            </File>
-            <File>
-              <FileName>BNO_085.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\BNO_085.h</FilePath>
+              <FilePath>..\Src\BNO085.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -519,6 +512,11 @@
               <FileName>stm32f4xx_hal.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c</FilePath>
             </File>
           </Files>
         </Group>
