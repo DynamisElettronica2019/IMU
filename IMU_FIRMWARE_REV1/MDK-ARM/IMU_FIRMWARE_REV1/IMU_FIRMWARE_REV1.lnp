@@ -5,6 +5,7 @@
 "imu_firmware_rev1\gpio.o"
 "imu_firmware_rev1\can.o"
 "imu_firmware_rev1\i2c.o"
+"imu_firmware_rev1\tim.o"
 "imu_firmware_rev1\stm32f4xx_it.o"
 "imu_firmware_rev1\stm32f4xx_hal_msp.o"
 "imu_firmware_rev1\stm32f4xx_hal_can.o"

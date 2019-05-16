@@ -33,4 +33,6 @@ imu_firmware_rev1\bno085.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2
 imu_firmware_rev1\bno085.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h
 imu_firmware_rev1\bno085.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h
 imu_firmware_rev1\bno085.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
+imu_firmware_rev1\bno085.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
+imu_firmware_rev1\bno085.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 imu_firmware_rev1\bno085.o: C:\Program Files (x86)\Keil\ARM\ARMCC\Bin\..\include\math.h

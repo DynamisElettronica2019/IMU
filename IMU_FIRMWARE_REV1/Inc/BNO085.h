@@ -1,3 +1,6 @@
+#ifndef __BNO085
+#define __BNO085
+
 #include "stdint.h"
 #include "i2c.h"
 #include <math.h>
@@ -79,6 +82,7 @@ typedef struct
 	uint8_t status;
 	uint8_t sequenceNumber;
 }rawSensorsDataType;
+
 /*Full sensor reading type*/
 typedef struct
 {
@@ -164,3 +168,5 @@ eulerType quaternionToEuler (quaternionType quaternion);
 float radToDeg(float angle);
 quaternionType populateQuaternion (int16_t real, int16_t i, int16_t j, int16_t k);
 float qToFloat(int16_t fixedPointValue, uint8_t qPoint);
+
+#endif

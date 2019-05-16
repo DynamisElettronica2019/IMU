@@ -21,11 +21,9 @@
 #include "can.h"
 
 /* USER CODE BEGIN 0 */
+#include "main.h"
 CAN_TxHeaderTypeDef packetHeader;
 CAN_FilterTypeDef canFilterConfigHeader;
-HAL_StatusTypeDef filterInitReturn;
-HAL_StatusTypeDef canStartReturn;
-HAL_StatusTypeDef canSendReturn;
 CAN_RxHeaderTypeDef canReceivedMessageHeader0;
 CAN_RxHeaderTypeDef canReceivedMessageHeader1;
 uint32_t packetMailbox;
@@ -86,8 +84,14 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* CAN1 interrupt Init */
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(CAN1_TX_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
+    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
+    HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
+    HAL_NVIC_SetPriority(CAN1_SCE_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
   /* USER CODE BEGIN CAN1_MspInit 1 */
 
   /* USER CODE END CAN1_MspInit 1 */
@@ -112,7 +116,10 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
 
     /* CAN1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
     HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
+    HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
+    HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
   /* USER CODE BEGIN CAN1_MspDeInit 1 */
 
   /* USER CODE END CAN1_MspDeInit 1 */
@@ -121,7 +128,8 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
 /* USER CODE BEGIN 1 */
 
-void CAN_send(int ID, uint16_t firstInt, uint16_t secondInt, uint16_t thirdInt, uint16_t fourthInt, uint8_t dlc_value)
+
+void CAN_send_unsigned(int ID, uint16_t firstInt, uint16_t secondInt, uint16_t thirdInt, uint16_t fourthInt, uint8_t dlc_value)
 {
 	uint32_t mailbox;
 	
@@ -142,32 +150,62 @@ void CAN_send(int ID, uint16_t firstInt, uint16_t secondInt, uint16_t thirdInt, 
   HAL_CAN_AddTxMessage(&hcan1, &header, dataPacket, &mailbox);
 }
 
+void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int16_t fourthInt, uint8_t dlc_value)
+{
+	uint32_t mailbox;
+	
+	header.StdId = ID;
+	header.RTR = CAN_RTR_DATA;
+	header.IDE = CAN_ID_STD;
+	header.DLC = dlc_value;
+	
+	dataPacket[0] = (uint8_t)((firstInt >> 8) & 0x00FF);
+  dataPacket[1] = (uint8_t)(firstInt & 0x00FF);
+  dataPacket[2] = (uint8_t)((secondInt >> 8) & 0x00FF);
+  dataPacket[3] = (uint8_t)(secondInt & 0x00FF);
+	dataPacket[4] = (uint8_t)((thirdInt >> 8) & 0x00FF);
+  dataPacket[5] = (uint8_t)(thirdInt & 0x00FF);
+  dataPacket[6] = (uint8_t)((fourthInt >> 8) & 0x00FF);
+  dataPacket[7] = (uint8_t)(fourthInt & 0x00FF);
+	
+  HAL_CAN_AddTxMessage(&hcan1, &header, dataPacket, &mailbox);
+}
+
+void canSendIMUPacket(BNO085 *myIMU)
+{
+	int16_t accX, accY, gyrX, gyrZ; /*First packet*/
+	int16_t heading, accZ, gyrY; /*Second packet*/
+	
+	accX = (int16_t)((myIMU->sensor_readings.acceleration.X)*100.00f);
+	accY = ((myIMU->sensor_readings.acceleration.Y)*100.00f);
+	accZ = ((myIMU->sensor_readings.acceleration.Z)*100.00f);
+	
+	gyrX = ((myIMU->sensor_readings.angular.X)*10.00f);
+	gyrY = ((myIMU->sensor_readings.angular.Y)*10.00f);
+	gyrZ = ((myIMU->sensor_readings.angular.Z)*10.00f);
+	
+	heading = ((myIMU->sensor_readings.absoluteOrientation.orientation.yaw)*100.00f);
+	
+	#ifdef IMU_1
+	CAN_send(IMU1_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
+	CAN_send(IMU1_DATA_2_ID, heading, accZ, gyrY, 0, 6);
+	#endif
+	
+	#ifdef IMU_2
+	CAN_send(IMU2_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
+	CAN_send(IMU2_DATA_2_ID, heading, accZ, gyrY, 0, 6);
+	#endif
+	
+}
+
 extern void canStart(void)
 {
 	canFilterConfig();
-	canStartReturn = HAL_CAN_Start(&hcan1);
+	
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO1_MSG_PENDING);
-	return;
-}
-
-extern void canSendDebug(void)
-{
-	packetHeader.StdId = 0x1B4;
-	packetHeader.RTR = CAN_RTR_DATA;
-	packetHeader.IDE = CAN_ID_STD;
-	packetHeader.DLC = 8;
-	packetHeader.TransmitGlobalTime = DISABLE;
-	dataPacket[0] = 8;
-	dataPacket[1] = 4;
-	dataPacket[2] = 3;
-	dataPacket[3] = 7;
-	dataPacket[4] = 9;
-	dataPacket[5] = 0;
-	dataPacket[6] = 1;
-	dataPacket[7] = 8;
-	canSendReturn = HAL_CAN_AddTxMessage(&hcan1, &packetHeader, dataPacket, &packetMailbox);
+	HAL_CAN_Start(&hcan1);
 	return;
 }
 
@@ -191,7 +229,7 @@ static void canFilterConfig(void)
 	canFilterConfigHeader.FilterFIFOAssignment = CAN_RX_FIFO0;
   canFilterConfigHeader.FilterActivation = ENABLE;	
   canFilterConfigHeader.SlaveStartFilterBank = 14;
-	filterInitReturn = HAL_CAN_ConfigFilter(&hcan1, &canFilterConfigHeader);
+	HAL_CAN_ConfigFilter(&hcan1, &canFilterConfigHeader);
 	return;
 }
 

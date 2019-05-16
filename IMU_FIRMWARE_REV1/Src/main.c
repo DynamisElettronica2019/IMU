@@ -22,12 +22,14 @@
 #include "main.h"
 #include "can.h"
 #include "i2c.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "BNO085.h"
 #include "id_can.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,6 +97,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_CAN1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 				
 	HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
@@ -142,9 +145,9 @@ int main(void)
 	BNO085_EnableRawGyroscope(&myIMU, 10);
 	BNO085_EnableRawMagnetometer(&myIMU, 10);
 
-	/*canStart();*/
+	canStart();
+	HAL_TIM_Base_Start_IT(&htim6);
 	
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -206,6 +209,13 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
+{
+	if (htim->Instance==TIM6)
+	{
+		canSendIMUPacket(&myIMU);
+	}
+}
 /* USER CODE END 4 */
 
 /**

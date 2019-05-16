@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : CAN.h
+  * File Name          : TIM.h
   * Description        : This file provides code for the configuration
-  *                      of the CAN instances.
+  *                      of the TIM instances.
   ******************************************************************************
   * @attention
   *
@@ -17,8 +17,8 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __can_H
-#define __can_H
+#ifndef __tim_H
+#define __tim_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -27,30 +27,25 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-#include "BNO085.h"
-#include "id_can.h"
+
 /* USER CODE END Includes */
 
-extern CAN_HandleTypeDef hcan1;
+extern TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_CAN1_Init(void);
+void MX_TIM6_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
-void canStart(void);
-void canSendDebug(void);
-void canFilterConfig(void);
-void canSendIMUPacket(BNO085 *myIMU);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ can_H */
+#endif /*__ tim_H */
 
 /**
   * @}

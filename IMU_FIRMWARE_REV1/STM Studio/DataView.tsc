@@ -1,5 +1,5 @@
 #STM Touch Studio user settings - do not edit
-#Thu May 16 15:23:16 CEST 2019
+#Thu May 16 18:04:35 CEST 2019
 ExprVariable.Col0ModelIdx=0
 ExprVariable.Col0Width=15
 ExprVariable.Col1ModelIdx=1
@@ -11,7 +11,7 @@ ExprVariable.Col3Width=155
 ExprVariable.Col4ModelIdx=4
 ExprVariable.Col4Width=40
 ExprVariable.Number=0
-GdbVar.ExecDate=1558010886690
+GdbVar.ExecDate=1558022602931
 GdbVar.LastExecRelative=..\\MDK-ARM\\IMU_FIRMWARE_REV1\\IMU_FIRMWARE_REV1.axf
 GdbVar.Version=1
 GeneralPurpose.HorizontalSplit=540
@@ -89,7 +89,7 @@ TouchPointViewer.YRange.Low=-255
 TouchPointViewer.YRange.Up=255
 VarViewer.DisplayAllMode=Bargraph
 VarViewer.Number=12
-VarViewer.SelectedTab=12
+VarViewer.SelectedTab=2
 VarViewer.ShowIndex=true
 VarViewer.Version=4
 VarViewer1.DisplayMode=Bargraph
@@ -139,7 +139,7 @@ VarViewer2.Var0.Name=myIMU.sensor_readings.angular.status
 VarViewer2.Var1.Name=myIMU.sensor_readings.angular.X
 VarViewer2.Var2.Name=myIMU.sensor_readings.angular.Y
 VarViewer2.Var3.Name=myIMU.sensor_readings.angular.Z
-VarViewer2.Visible=false
+VarViewer2.Visible=true
 VarViewer3.DisplayMode=Bargraph
 VarViewer3.Hexa=false
 VarViewer3.Name=Magnetic field
@@ -226,7 +226,7 @@ VarViewer9.Var0.Name=myIMU.sensor_readings.rawAccelerometer.status
 VarViewer9.Var1.Name=myIMU.sensor_readings.rawAccelerometer.X
 VarViewer9.Var2.Name=myIMU.sensor_readings.rawAccelerometer.Y
 VarViewer9.Var3.Name=myIMU.sensor_readings.rawAccelerometer.Z
-VarViewer9.Visible=true
+VarViewer9.Visible=false
 Variable.Col0ModelIdx=0
 Variable.Col0Width=15
 Variable.Col1ModelIdx=1
