@@ -32,6 +32,8 @@ uint32_t packetMailbox;
 uint8_t dataPacket[8];
 uint8_t canReceivedMessageData0[8];
 uint8_t canReceivedMessageData1[8];
+
+CAN_TxHeaderTypeDef header;
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;
@@ -118,6 +120,28 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 } 
 
 /* USER CODE BEGIN 1 */
+
+void CAN_send(int ID, uint16_t firstInt, uint16_t secondInt, uint16_t thirdInt, uint16_t fourthInt, uint8_t dlc_value)
+{
+	uint32_t mailbox;
+	
+	header.StdId = ID;
+	header.RTR = CAN_RTR_DATA;
+	header.IDE = CAN_ID_STD;
+	header.DLC = dlc_value;
+	
+	dataPacket[0] = (uint8_t)((firstInt >> 8) & 0x00FF);
+  dataPacket[1] = (uint8_t)(firstInt & 0x00FF);
+  dataPacket[2] = (uint8_t)((secondInt >> 8) & 0x00FF);
+  dataPacket[3] = (uint8_t)(secondInt & 0x00FF);
+	dataPacket[4] = (uint8_t)((thirdInt >> 8) & 0x00FF);
+  dataPacket[5] = (uint8_t)(thirdInt & 0x00FF);
+  dataPacket[6] = (uint8_t)((fourthInt >> 8) & 0x00FF);
+  dataPacket[7] = (uint8_t)(fourthInt & 0x00FF);
+	
+  HAL_CAN_AddTxMessage(&hcan1, &header, dataPacket, &mailbox);
+}
+
 extern void canStart(void)
 {
 	canFilterConfig();

@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "BNO085.h"
+#include "id_can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +48,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+	uint8_t count=0;
+	BNO085 myIMU;
+	uint16_t length=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,8 +71,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint8_t count=0;
-	BNO085 *myIMU;
+
   /* USER CODE END 1 */
   
 
@@ -111,29 +113,36 @@ int main(void)
 			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);	
 			count++;	
 	}
-
-	myIMU=BNO085_CreateIMU(&hi2c1, BNO085_ADDRESS, GPIOC, RESET_IMU_Pin, GPIOC, nBOOT_IMU_Pin);
-	BNO085_HardReset(myIMU);
-	HAL_Delay(250);
 	
-	if (BNO085_IsAlive(myIMU)==0)
+	myIMU=BNO085_CreateIMU(&hi2c1, BNO085_ADDRESS, GPIOC, RESET_IMU_Pin, GPIOC, nBOOT_IMU_Pin);
+	BNO085_HardReset(&myIMU);
+	
+	HAL_Delay(250);
+	if (BNO085_IsAlive(&myIMU)==0)
 	{
 		HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);
 	}
-	
 	HAL_Delay(50);
-	BNO085_FlushI2C(myIMU);
+	BNO085_FlushI2C(&myIMU);
 	HAL_Delay(50);
-	BNO085_FlushI2C(myIMU);
+	BNO085_FlushI2C(&myIMU);
 	HAL_Delay(50);
 
-	BNO085_EnableAccelerometer(myIMU,10);
-	BNO085_EnableGyroscope(myIMU,10);
-	BNO085_EnableLinearAcc(myIMU,10);
-	BNO085_EnableAbsoluteRotationVector(myIMU,10);
-	BNO085_EnableRelativeRotationVector(myIMU,10);
+	/*Enable sensor reports functions*/
 	
-	canStart();
+	BNO085_EnableAccelerometer (&myIMU, 10);
+	BNO085_EnableGyroscope (&myIMU, 10);
+	BNO085_EnableMagnetometer(&myIMU, 10);
+	BNO085_EnableLinearAcc(&myIMU, 10);
+	BNO085_EnableAbsoluteRotationVector(&myIMU, 10);
+	BNO085_EnableGravity(&myIMU, 10);
+	BNO085_EnableRelativeRotationVector(&myIMU, 10);
+	BNO085_EnableGeoRotation(&myIMU, 20);
+	BNO085_EnableRawAccelerometer(&myIMU, 10);
+	BNO085_EnableRawGyroscope(&myIMU, 10);
+	BNO085_EnableRawMagnetometer(&myIMU, 10);
+
+	/*canStart();*/
 	
 
   /* USER CODE END 2 */
@@ -145,8 +154,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		BNO085_UpdateSensorReading(myIMU);
-		canSendDebug();
+		BNO085_UpdateSensorReading(&myIMU);
+
+		/*canSendDebug();*/
   }
   /* USER CODE END 3 */
 }

@@ -35,5 +35,5 @@ imu_firmware_rev1\main.o: ../Inc/can.h
 imu_firmware_rev1\main.o: ../Inc/i2c.h
 imu_firmware_rev1\main.o: ../Inc/gpio.h
 imu_firmware_rev1\main.o: ../Inc/BNO085.h
-imu_firmware_rev1\main.o: C:\Program Files (x86)\Keil\ARM\ARMCC\Bin\..\include\stdlib.h
 imu_firmware_rev1\main.o: C:\Program Files (x86)\Keil\ARM\ARMCC\Bin\..\include\math.h
+imu_firmware_rev1\main.o: ../Inc/id_can.h
