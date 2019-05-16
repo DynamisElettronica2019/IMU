@@ -71,6 +71,14 @@ typedef struct
 	float accuracy;
 }orientationDataType;
 
+typedef struct
+{
+	uint16_t X;
+	uint16_t Y;
+	uint16_t Z;
+	uint8_t status;
+	uint8_t sequenceNumber;
+}rawSensorsDataType;
 /*Full sensor reading type*/
 typedef struct
 {
@@ -84,9 +92,9 @@ typedef struct
 	orientationDataType relativeOrientation;
 	orientationDataType geoOrientation;
 	
-	motionDataType rawAccelerometer;
-	motionDataType rawGyroscope;
-	motionDataType rawMagnetometer;	
+	rawSensorsDataType rawAccelerometer;
+	rawSensorsDataType rawGyroscope;
+	rawSensorsDataType rawMagnetometer;	
 }fullSensorReadingType;
 
 /*IMU Typedef*/
@@ -103,8 +111,7 @@ typedef struct
 	uint8_t sequenceNumber[6];																/*Sequence numbers array*/
 	uint8_t commandSequenceNumber;														/*Command sequence number*/
 	fullSensorReadingType sensor_readings;	
-	uint8_t sensorsEnabled[22];																/*sensorsEnabled[ID_SENSOR]= 0 -> not enabled, 1 -> enabled*/
-	uint8_t debug;
+	uint8_t sensorsEnabled[23];																/*sensorsEnabled[ID_SENSOR]= 0 -> not enabled, 1 -> enabled*/
 }BNO085;
 
 /*This funcition creates and initializes a new BNO085 object. It returns a pointer to the object. If boot is not used, pass NULL to the GPIO_TypeDef argument*/
@@ -148,9 +155,9 @@ motionDataType BNO085_GetGravity(BNO085 *myIMU);
 orientationDataType BNO085_GetRelativeOrientation(BNO085 *myIMU);
 orientationDataType BNO085_GetGeoOrientation(BNO085 *myIMU);
 
-motionDataType BNO085_GetRawAccelerometer(BNO085 *myIMU);
-motionDataType BNO085_GetRawGyroscope(BNO085 *myIMU);
-motionDataType BNO085_GetRawMagnetometer(BNO085 *myIMU);
+rawSensorsDataType BNO085_GetRawAccelerometer(BNO085 *myIMU);
+rawSensorsDataType BNO085_GetRawGyroscope(BNO085 *myIMU);
+rawSensorsDataType BNO085_GetRawMagnetometer(BNO085 *myIMU);
 
 /*Math functions*/
 eulerType quaternionToEuler (quaternionType quaternion);

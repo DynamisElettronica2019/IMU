@@ -127,7 +127,7 @@ void BNO085_SoftReset(BNO085 *myIMU)
 {
 	uint8_t i=0;
 	
-	while (i<10)
+	while (i<23)
 	{
 		myIMU->sensorsEnabled[i]=0;
 		i++;
@@ -351,15 +351,15 @@ void BNO085_UpdateSensorReading(BNO085 *myIMU)
 			break;
 
 			case ID_RAW_ACCELEROMETER:
-				myIMU->sensor_readings.rawAccelerometer = BNO085_GetLinearAcceleration(myIMU);
+				myIMU->sensor_readings.rawAccelerometer = BNO085_GetRawAccelerometer(myIMU);
 			break;
 
 			case ID_RAW_GYROSCOPE:
-				myIMU->sensor_readings.rawGyroscope = BNO085_GetLinearAcceleration(myIMU);
+				myIMU->sensor_readings.rawGyroscope = BNO085_GetRawGyroscope(myIMU);
 			break;
 									
 			case ID_RAW_MAGNETOMETER:
-				myIMU->sensor_readings.rawMagnetometer = BNO085_GetLinearAcceleration(myIMU);
+				myIMU->sensor_readings.rawMagnetometer = BNO085_GetRawMagnetometer(myIMU);
 			break;
 	
 			default:
@@ -473,20 +473,40 @@ motionDataType BNO085_GetLinearAcceleration(BNO085 *myIMU)
 	return linearAccData;
 }
 
-
-
 orientationDataType BNO085_GetAbsoluteOrientation(BNO085 *myIMU)
 {
 	orientationDataType absoluteOrientation;
-	quaternionType myQuaternion;
-	myQuaternion.qi=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[14] << 8 | myIMU->BNO085_Receive_Buffer[13],14);
-	myQuaternion.qj=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[16] << 8 | myIMU->BNO085_Receive_Buffer[15],14);
-	myQuaternion.qk=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[18] << 8 | myIMU->BNO085_Receive_Buffer[17],14);
-	myQuaternion.qw=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[20] << 8 | myIMU->BNO085_Receive_Buffer[19],14);
-	absoluteOrientation.orientation=quaternionToEuler(myQuaternion);
-	absoluteOrientation.status=myIMU->BNO085_Receive_Buffer[11]&0x03;
+	quaternionType absoluteQuaternion;
+
+	uint16_t quaternionI;
+	uint16_t quaternionJ;
+	uint16_t quaternionK;
+	uint16_t quaternionR;
+	uint16_t accuracy;
+	
+	uint8_t status;
+	
+	quaternionI=((((uint16_t)myIMU->BNO085_Receive_Buffer[14]) << 8)| myIMU->BNO085_Receive_Buffer[13]);
+	quaternionJ=((((uint16_t)myIMU->BNO085_Receive_Buffer[16]) << 8)| myIMU->BNO085_Receive_Buffer[15]);
+	quaternionK=((((uint16_t)myIMU->BNO085_Receive_Buffer[18]) << 8)| myIMU->BNO085_Receive_Buffer[17]);
+	quaternionR=((((uint16_t)myIMU->BNO085_Receive_Buffer[20]) << 8)| myIMU->BNO085_Receive_Buffer[19]);
+	
+	absoluteQuaternion.qi=qToFloat(quaternionI,14);
+	absoluteQuaternion.qj=qToFloat(quaternionJ,14);
+	absoluteQuaternion.qk=qToFloat(quaternionK,14);
+	absoluteQuaternion.qw=qToFloat(quaternionR,14);
+	
+	absoluteOrientation.orientation=quaternionToEuler(absoluteQuaternion);
+	
+	status = myIMU->BNO085_Receive_Buffer[11]&0x03;
+	absoluteOrientation.status = status;
+
 	absoluteOrientation.sequenceNumber=myIMU->BNO085_Receive_Buffer[10];
-	absoluteOrientation.accuracy=radToDeg(qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[22] << 8 | myIMU->BNO085_Receive_Buffer[21],12));
+	
+	accuracy = ((((uint16_t)myIMU->BNO085_Receive_Buffer[22]) << 8)| myIMU->BNO085_Receive_Buffer[21]);
+	accuracy=qToFloat(accuracy,12);
+	absoluteOrientation.accuracy=radToDeg(accuracy);
+	
 	return absoluteOrientation;
 }
 
@@ -517,21 +537,75 @@ motionDataType BNO085_GetGravity(BNO085 *myIMU)
 orientationDataType BNO085_GetRelativeOrientation(BNO085 *myIMU)
 {
 	orientationDataType relativeOrientation;
-	quaternionType myQuaternion;
-	myQuaternion.qi=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[14] << 8 | myIMU->BNO085_Receive_Buffer[13],14);
-	myQuaternion.qj=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[16] << 8 | myIMU->BNO085_Receive_Buffer[15],14);
-	myQuaternion.qk=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[18] << 8 | myIMU->BNO085_Receive_Buffer[17],14);
-	myQuaternion.qw=qToFloat((uint16_t)myIMU->BNO085_Receive_Buffer[20] << 8 | myIMU->BNO085_Receive_Buffer[19],14);
-	relativeOrientation.orientation=quaternionToEuler(myQuaternion);
-	relativeOrientation.status=myIMU->BNO085_Receive_Buffer[11]&0x03;
-	relativeOrientation.sequenceNumber=0;
-	relativeOrientation.accuracy=0;
+	quaternionType relativeQuaternion;
+
+	uint16_t quaternionI;
+	uint16_t quaternionJ;
+	uint16_t quaternionK;
+	uint16_t quaternionR;
+	
+	uint8_t status;
+	
+	quaternionI=((((uint16_t)myIMU->BNO085_Receive_Buffer[14]) << 8)| myIMU->BNO085_Receive_Buffer[13]);
+	quaternionJ=((((uint16_t)myIMU->BNO085_Receive_Buffer[16]) << 8)| myIMU->BNO085_Receive_Buffer[15]);
+	quaternionK=((((uint16_t)myIMU->BNO085_Receive_Buffer[18]) << 8)| myIMU->BNO085_Receive_Buffer[17]);
+	quaternionR=((((uint16_t)myIMU->BNO085_Receive_Buffer[20]) << 8)| myIMU->BNO085_Receive_Buffer[19]);
+	
+	relativeQuaternion.qi=qToFloat(quaternionI,14);
+	relativeQuaternion.qj=qToFloat(quaternionJ,14);
+	relativeQuaternion.qk=qToFloat(quaternionK,14);
+	relativeQuaternion.qw=qToFloat(quaternionR,14);
+	
+	relativeOrientation.orientation=quaternionToEuler(relativeQuaternion);
+	
+	status = myIMU->BNO085_Receive_Buffer[11]&0x03;
+	relativeOrientation.status = status;
+
+	relativeOrientation.sequenceNumber=myIMU->BNO085_Receive_Buffer[10];
+	
 	return relativeOrientation;
 }
 
-motionDataType BNO085_GetRawAccelerometer(BNO085 *myIMU)
+orientationDataType BNO085_GetGeoOrientation(BNO085 *myIMU)
 {
-	motionDataType rawAccelerometerData;
+	orientationDataType geoOrientation;
+	quaternionType geoQuaternion;
+
+	uint16_t quaternionI;
+	uint16_t quaternionJ;
+	uint16_t quaternionK;
+	uint16_t quaternionR;
+	uint16_t accuracy;
+	
+	uint8_t status;
+	
+	quaternionI=((((uint16_t)myIMU->BNO085_Receive_Buffer[14]) << 8)| myIMU->BNO085_Receive_Buffer[13]);
+	quaternionJ=((((uint16_t)myIMU->BNO085_Receive_Buffer[16]) << 8)| myIMU->BNO085_Receive_Buffer[15]);
+	quaternionK=((((uint16_t)myIMU->BNO085_Receive_Buffer[18]) << 8)| myIMU->BNO085_Receive_Buffer[17]);
+	quaternionR=((((uint16_t)myIMU->BNO085_Receive_Buffer[20]) << 8)| myIMU->BNO085_Receive_Buffer[19]);
+	
+	geoQuaternion.qi=qToFloat(quaternionI,14);
+	geoQuaternion.qj=qToFloat(quaternionJ,14);
+	geoQuaternion.qk=qToFloat(quaternionK,14);
+	geoQuaternion.qw=qToFloat(quaternionR,14);
+	
+	geoOrientation.orientation=quaternionToEuler(geoQuaternion);
+	
+	status = myIMU->BNO085_Receive_Buffer[11]&0x03;
+	geoOrientation.status = status;
+
+	geoOrientation.sequenceNumber=myIMU->BNO085_Receive_Buffer[10];
+	
+	accuracy = ((((uint16_t)myIMU->BNO085_Receive_Buffer[22]) << 8)| myIMU->BNO085_Receive_Buffer[21]);
+	accuracy=qToFloat(accuracy,12);
+	geoOrientation.accuracy=radToDeg(accuracy);
+	
+	return geoOrientation;
+}
+
+rawSensorsDataType BNO085_GetRawAccelerometer(BNO085 *myIMU)
+{
+	rawSensorsDataType rawAccelerometerData;
 	uint8_t status;
 	uint16_t dataRawX;
 	uint16_t dataRawY;
@@ -553,9 +627,9 @@ motionDataType BNO085_GetRawAccelerometer(BNO085 *myIMU)
 	return rawAccelerometerData;
 }
 
-motionDataType BNO085_GetRawGyroscope(BNO085 *myIMU)
+rawSensorsDataType BNO085_GetRawGyroscope(BNO085 *myIMU)
 {
-	motionDataType rawGyroscopeData;
+	rawSensorsDataType rawGyroscopeData;
 	uint8_t status;
 	uint16_t dataRawX;
 	uint16_t dataRawY;
@@ -577,9 +651,9 @@ motionDataType BNO085_GetRawGyroscope(BNO085 *myIMU)
 	return rawGyroscopeData;
 }
 
-motionDataType BNO085_GetRawMagnetometer(BNO085 *myIMU)
+rawSensorsDataType BNO085_GetRawMagnetometer(BNO085 *myIMU)
 {
-	motionDataType rawMagnetometerData;
+	rawSensorsDataType rawMagnetometerData;
 	uint8_t status;
 	uint16_t dataRawX;
 	uint16_t dataRawY;

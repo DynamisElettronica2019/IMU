@@ -1,7 +1,7 @@
 Dependencies for Project 'IMU_FIRMWARE_REV1', Target 'IMU_FIRMWARE_REV1': (DO NOT MODIFY !)
 F (startup_stm32f413xx.s)(0x5CDD2428)(--cpu Cortex-M4.fp -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_IMU_FIRMWARE_REV1-I"C:\Program Files (x86)\Keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include"-I"C:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include"--pd "__UVISION_VERSION SETA 524" --pd "_RTE_ SETA 1" --pd "STM32F413xx SETA 1"--list startup_stm32f413xx.lst --xref -o imu_firmware_rev1\startup_stm32f413xx.o --depend imu_firmware_rev1\startup_stm32f413xx.d)
-F (..\Src\BNO085.c)(0x5CDD3B7B)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_IMU_FIRMWARE_REV1-I"C:\Program Files (x86)\Keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include"-I"C:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include"-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F413xx -DUSE_HAL_DRIVER -DSTM32F413xx-o imu_firmware_rev1\bno085.o --omf_browse imu_firmware_rev1\bno085.crf --depend imu_firmware_rev1\bno085.d)
-I (../Inc/BNO085.h)(0x5CDD3B7B)
+F (..\Src\BNO085.c)(0x5CDD5BFE)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_IMU_FIRMWARE_REV1-I"C:\Program Files (x86)\Keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include"-I"C:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include"-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F413xx -DUSE_HAL_DRIVER -DSTM32F413xx-o imu_firmware_rev1\bno085.o --omf_browse imu_firmware_rev1\bno085.crf --depend imu_firmware_rev1\bno085.d)
+I (../Inc/BNO085.h)(0x5CDD5B77)
 I (C:\Program Files (x86)\Keil\ARM\ARMCC\include\stdint.h)(0x588BE5B4)
 I (../Inc/i2c.h)(0x5CDD2421)
 I (../Inc/main.h)(0x5CDD2423)
@@ -35,7 +35,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h)(0x5CCF4791)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x5CCF4791)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x5CCF4791)
 I (C:\Program Files (x86)\Keil\ARM\ARMCC\include\math.h)(0x588BE5B4)
-F (../Src/main.c)(0x5CDD2E97)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_IMU_FIRMWARE_REV1-I"C:\Program Files (x86)\Keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include"-I"C:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include"-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F413xx -DUSE_HAL_DRIVER -DSTM32F413xx-o imu_firmware_rev1\main.o --omf_browse imu_firmware_rev1\main.crf --depend imu_firmware_rev1\main.d)
+F (../Src/main.c)(0x5CDD44A9)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_IMU_FIRMWARE_REV1-I"C:\Program Files (x86)\Keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include"-I"C:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include"-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F413xx -DUSE_HAL_DRIVER -DSTM32F413xx-o imu_firmware_rev1\main.o --omf_browse imu_firmware_rev1\main.crf --depend imu_firmware_rev1\main.d)
 I (../Inc/main.h)(0x5CDD2423)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5CCF4791)
 I (../Inc/stm32f4xx_hal_conf.h)(0x5CDD2423)
@@ -70,7 +70,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x5CCF4791)
 I (../Inc/can.h)(0x5CDD23F0)
 I (../Inc/i2c.h)(0x5CDD2421)
 I (../Inc/gpio.h)(0x5CDD23F0)
-I (../Inc/BNO085.h)(0x5CDD3B7B)
+I (../Inc/BNO085.h)(0x5CDD5B77)
 I (C:\Program Files (x86)\Keil\ARM\ARMCC\include\math.h)(0x588BE5B4)
 I (../Inc/id_can.h)(0x5CDD233A)
 F (../Src/gpio.c)(0x5CDD23F0)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_IMU_FIRMWARE_REV1-I"C:\Program Files (x86)\Keil\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include"-I"C:\Program Files (x86)\Keil\ARM\PACK\Keil\STM32F4xx_DFP\2.13.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include"-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F413xx -DUSE_HAL_DRIVER -DSTM32F413xx-o imu_firmware_rev1\gpio.o --omf_browse imu_firmware_rev1\gpio.crf --depend imu_firmware_rev1\gpio.d)
