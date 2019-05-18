@@ -184,7 +184,7 @@ void canSendIMUPacket(BNO085 *myIMU)
 	gyrY = ((myIMU->sensor_readings.angular.Y)*10.00f);
 	gyrZ = ((myIMU->sensor_readings.angular.Z)*10.00f);
 	
-	heading = ((myIMU->sensor_readings.absoluteOrientation.orientation.yaw)*100.00f);
+	heading = ((myIMU->sensor_readings.absoluteOrientation.orientation.pitch)*100.00f);
 	
 	#ifdef IMU_1
 	CAN_send(IMU1_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
@@ -195,6 +195,7 @@ void canSendIMUPacket(BNO085 *myIMU)
 	CAN_send(IMU2_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
 	CAN_send(IMU2_DATA_2_ID, heading, accZ, gyrY, 0, 6);
 	#endif
+		HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
 	
 }
 
@@ -212,7 +213,6 @@ extern void canStart(void)
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
   HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &canReceivedMessageHeader0, canReceivedMessageData0);
-	HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
 	
 	return;
 }

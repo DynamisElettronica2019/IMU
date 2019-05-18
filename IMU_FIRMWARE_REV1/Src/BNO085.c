@@ -82,7 +82,7 @@ float qToFloat(int16_t fixedPointValue, uint8_t qPoint)
 BNO085 BNO085_CreateIMU (I2C_HandleTypeDef *hi2cx, uint8_t address, GPIO_TypeDef *reset_GPIOx, uint16_t reset_Pin, GPIO_TypeDef *boot_GPIOx, uint16_t nBOOT_Pin)
 {
 	BNO085 myIMU;
-	int i=0;
+	int i;
 	
 	myIMU.hi2cx=hi2cx;
 	myIMU.address=address;
@@ -90,16 +90,29 @@ BNO085 BNO085_CreateIMU (I2C_HandleTypeDef *hi2cx, uint8_t address, GPIO_TypeDef
 	myIMU.reset_Pin=reset_Pin;
 	myIMU.boot_GPIOx=boot_GPIOx;
 	myIMU.nBOOT_Pin=nBOOT_Pin;
+	myIMU.commandSequenceNumber=0;
 	
+	i=0;
 	while (i<6)
 	{
 		myIMU.sequenceNumber[i]=0;
 		i++;
 	}
+	
 	i=0;
 	while (i<10)
 	{
 		myIMU.sensorsEnabled[i]=0;
+		i++;
+	}
+	myIMU.commandSequenceNumber=0;
+	
+	i=0;
+	while (i<BNO085_DEBUG_BUFFER_LENGTH)
+	{
+		myIMU.BNO085_Command_Buffer[i]=0;
+		myIMU.BNO085_FRS_Buffer[i]=0;
+		myIMU.BNO085_Product_ID_Buffer[i]=0;
 		i++;
 	}
 	myIMU.commandSequenceNumber=0;
@@ -228,7 +241,7 @@ uint8_t BNO085_SetFeatureCommand(BNO085 *myIMU, uint8_t sensorID, uint16_t timeB
 		dataLength = BNO085_DataAvailable(myIMU);
 	}
 	BNO085_ReceiveData(myIMU, dataLength);
-	if (myIMU->BNO085_Receive_Buffer[4]==0xFC)
+	if (myIMU->BNO085_Receive_Buffer[4]== SHTP_SET_FEATURE_RESPONSE)
 	{
 		myIMU->sensorsEnabled[myIMU->BNO085_Receive_Buffer[5]]=1;
 	}
@@ -314,6 +327,8 @@ void BNO085_UpdateSensorReading(BNO085 *myIMU)
 			length = BNO085_DataAvailable(myIMU);
 	}
 	BNO085_ReceiveData(myIMU, length);
+
+	/*Handle sensor reports*/
 	if (myIMU->BNO085_Receive_Buffer[2]==CHANNEL_REPORTS && myIMU->BNO085_Receive_Buffer[4]==SHTP_BASE_TIMESTAMP)
 	{
 		switch (myIMU->BNO085_Receive_Buffer[9])
@@ -366,7 +381,22 @@ void BNO085_UpdateSensorReading(BNO085 *myIMU)
 				/*Unhandled ID*/
 			break;
 		}
+		return;
 	}
+	
+	/*Handle product ID response*/
+	if (myIMU->BNO085_Receive_Buffer[2]==CHANNEL_CONTROL && myIMU->BNO085_Receive_Buffer[4]==SHTP_PRODUCT_ID_RESPONSE)
+	{
+		BNO085_GetProductID(myIMU, 20);
+		return;
+	}
+	
+	if (myIMU->BNO085_Receive_Buffer[2]==CHANNEL_CONTROL && myIMU->BNO085_Receive_Buffer[4]==SHTP_COMMAND_RESPONSE)
+	{
+		BNO085_GetCommandResponse(myIMU, length);
+		return;
+	}
+	
 	return;
 }
 
@@ -673,4 +703,140 @@ rawSensorsDataType BNO085_GetRawMagnetometer(BNO085 *myIMU)
 	dataRawZ = ((((uint16_t)myIMU->BNO085_Receive_Buffer[18]) << 8) | myIMU->BNO085_Receive_Buffer[17]);
 	rawMagnetometerData.Z = dataRawZ;
 	return rawMagnetometerData;
+}
+
+void BNO085_Product_ID_Request (BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=6;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+	
+	myIMU->BNO085_Send_Buffer[4]= SHTP_PRODUCT_ID_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]= 0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,6, 1000);
+	return;
+}
+
+void BNO085_GetProductID(BNO085 *myIMU, uint16_t length)
+{
+	int count=0;
+	
+	while (count<length)
+	{
+		myIMU->BNO085_Product_ID_Buffer[count]=myIMU->BNO085_Receive_Buffer[count];
+		count++;
+	}
+	return;
+}
+
+void BNO085_Command_TareNow(BNO085 *myIMU, uint8_t axesToTare, uint8_t vectorToTare)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_TARE;
+	myIMU->BNO085_Send_Buffer[7]=0x00;
+		
+	myIMU->BNO085_Send_Buffer[8]=axesToTare;
+	myIMU->BNO085_Send_Buffer[9]=vectorToTare;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+void BNO085_Command_ConfigureCalibration(BNO085 *myIMU, uint8_t accelerometer, uint8_t gyroscope, uint8_t magnetometer, uint8_t planar)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_ME_CALIBRATION;
+	myIMU->BNO085_Send_Buffer[7]=accelerometer;
+		
+	myIMU->BNO085_Send_Buffer[8]=gyroscope;
+	myIMU->BNO085_Send_Buffer[9]=magnetometer;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=planar;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+void BNO085_Command_GetCalibrationStatus(BNO085 *myIMU)
+{
+		myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_ME_CALIBRATION;
+	myIMU->BNO085_Send_Buffer[7]=0;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=1;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+void BNO085_Command_EnableFullCalibration(BNO085 *myIMU)
+{
+	BNO085_Command_ConfigureCalibration(myIMU,1,1,1,1);
+	return;
+}
+void BNO085_Command_DisableFullCalibration(BNO085 *myIMU)
+{
+	BNO085_Command_ConfigureCalibration(myIMU,0,0,0,0);
+	return;
+}
+
+void BNO085_GetCommandResponse(BNO085 *myIMU, uint16_t length)
+{
+	int count=0;
+	
+	if (length>BNO085_DEBUG_BUFFER_LENGTH)
+	{
+		length=BNO085_BUFFER_LENGTH;
+	}
+	
+	while (count<length)
+	{
+		myIMU->BNO085_Command_Buffer[count]=myIMU->BNO085_Receive_Buffer[count];
+		count++;
+	}
+	
+	return;
 }

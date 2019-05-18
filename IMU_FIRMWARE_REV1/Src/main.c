@@ -132,6 +132,8 @@ int main(void)
 	HAL_Delay(50);
 
 	/*Enable sensor reports functions*/
+	BNO085_Command_EnableFullCalibration(&myIMU);
+	BNO085_UpdateSensorReading(&myIMU);
 	
 	BNO085_EnableAccelerometer (&myIMU, 10);
 	BNO085_EnableGyroscope (&myIMU, 10);
@@ -144,7 +146,10 @@ int main(void)
 	BNO085_EnableRawAccelerometer(&myIMU, 10);
 	BNO085_EnableRawGyroscope(&myIMU, 10);
 	BNO085_EnableRawMagnetometer(&myIMU, 10);
-
+	
+	BNO085_Product_ID_Request(&myIMU);
+	BNO085_UpdateSensorReading(&myIMU);
+	
 	canStart();
 	HAL_TIM_Base_Start_IT(&htim6);
 	
@@ -158,7 +163,11 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		BNO085_UpdateSensorReading(&myIMU);
-
+		if (count==1)
+		{
+			BNO085_Command_TareNow(&myIMU,0x07,1);
+			count=0;
+		}
 		/*canSendDebug();*/
   }
   /* USER CODE END 3 */
