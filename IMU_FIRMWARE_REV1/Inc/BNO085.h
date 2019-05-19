@@ -139,7 +139,7 @@ eulerType quaternionToEuler (quaternionType quaternion);
 float radToDeg(float angle);
 quaternionType populateQuaternion (int16_t real, int16_t i, int16_t j, int16_t k);
 float qToFloat(int16_t fixedPointValue, uint8_t qPoint);
-
+int32_t floatToQ (double realToConvert, uint8_t qPoint);
 /*This funcition creates and initializes a new BNO085 object. It returns a pointer to the object. If boot is not used, pass NULL to the GPIO_TypeDef argument*/
 BNO085 BNO085_CreateIMU (I2C_HandleTypeDef *hi2cx, uint8_t address, GPIO_TypeDef *reset_GPIOx, uint16_t reset_Pin, GPIO_TypeDef *boot_GPIOx, uint16_t nBOOT_Pin);
 
@@ -190,29 +190,30 @@ void BNO085_Product_ID_Request (BNO085 *myIMU);
 void BNO085_GetProductID(BNO085 *myIMU, uint16_t length);
 
 /*Command functions*/
-void BNO085_Command_RequestErrorReport(BNO085 *myIMU, uint8_t severity);//
+void BNO085_Command_RequestErrorReport(BNO085 *myIMU, uint8_t severity);
 
-void BNO085_Command_GetCounts(BNO085 *myIMU, uint8_t sensorID);//
-void BNO085_Command_ClearCounts(BNO085 *myIMU, uint8_t senorID);//
+void BNO085_Command_GetCounts(BNO085 *myIMU, uint8_t sensorID);
+void BNO085_Command_ClearCounts(BNO085 *myIMU, uint8_t sensorID);
 
 void BNO085_Command_TareNow(BNO085 *myIMU, uint8_t axesToTare, uint8_t vectorToTare);
-void BNO085_Command_PersistTare(BNO085 *myIMU);//
-void BNO085_Command_SetReorientation(BNO085 *myIMU, float quatX, float quatY, float quatZ, float quatW);//
+void BNO085_Command_PersistTare(BNO085 *myIMU);
+void BNO085_Command_SetReorientation(BNO085 *myIMU, double quatX, double quatY, double quatZ, double quatW);
 
-void BNO085_Command_Initialize(BNO085 *myIMU);//
+void BNO085_Command_Initialize(BNO085 *myIMU);
 
-void BNO085_Command_SaveDCD(BNO085 *myIMU);//
+void BNO085_Command_SaveDCD(BNO085 *myIMU);
 
 void BNO085_Command_EnableFullCalibration(BNO085 *myIMU);
 void BNO085_Command_DisableFullCalibration(BNO085 *myIMU);
 void BNO085_Command_ConfigureCalibration(BNO085 *myIMU, uint8_t accelerometer, uint8_t gyroscope, uint8_t magnetometer, uint8_t planar);
 void BNO085_Command_GetCalibrationStatus(BNO085 *myIMU);
 
-void BNO085_Command_ConfigureDCD(BNO085 *myIMU);//
+void BNO085_Command_EnableAutoSaveDCD(BNO085 *myIMU);
+void BNO085_Command_DisableAutoSaveDCD(BNO085 *myIMU);
 
-void BNO085_Command_GetOscType(BNO085 *myIMU);//
+void BNO085_Command_GetOscType(BNO085 *myIMU);
 
-void BNO085_Command_ClearResetDCD(BNO085 *myIMU);//
+void BNO085_Command_ClearResetDCD(BNO085 *myIMU);
 
 /*Command parsing*/
 void BNO085_GetCommandResponse(BNO085 *myIMU, uint16_t length);

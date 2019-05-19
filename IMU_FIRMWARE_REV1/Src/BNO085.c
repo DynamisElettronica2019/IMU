@@ -76,6 +76,14 @@ float qToFloat(int16_t fixedPointValue, uint8_t qPoint)
 	return (qFloat);
 }
 
+int32_t floatToQ (double realToConvert, uint8_t qPoint)
+{
+	int32_t qFormatNumber;
+	realToConvert=realToConvert*pow(2,qPoint);
+	qFormatNumber=(int32_t)realToConvert;
+	return qFormatNumber;
+}
+
 /*BNO085 Functions*/
 
 /*Initialization functions*/
@@ -391,6 +399,7 @@ void BNO085_UpdateSensorReading(BNO085 *myIMU)
 		return;
 	}
 	
+	/*Handle command responses*/
 	if (myIMU->BNO085_Receive_Buffer[2]==CHANNEL_CONTROL && myIMU->BNO085_Receive_Buffer[4]==SHTP_COMMAND_RESPONSE)
 	{
 		BNO085_GetCommandResponse(myIMU, length);
@@ -732,6 +741,90 @@ void BNO085_GetProductID(BNO085 *myIMU, uint16_t length)
 	return;
 }
 
+void BNO085_Command_RequestErrorReport(BNO085 *myIMU, uint8_t severity)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_ERRORS;
+	myIMU->BNO085_Send_Buffer[7]=severity;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+	
+void BNO085_Command_GetCounts(BNO085 *myIMU, uint8_t sensorID)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_COUNTER;
+	myIMU->BNO085_Send_Buffer[7]=0x00;
+		
+	myIMU->BNO085_Send_Buffer[8]=sensorID;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+void BNO085_Command_ClearCounts(BNO085 *myIMU, uint8_t sensorID)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_COUNTER;
+	myIMU->BNO085_Send_Buffer[7]=0x01;
+		
+	myIMU->BNO085_Send_Buffer[8]=sensorID;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+/*Axes to tare: 0x07 -> tare around all exes; 0x04 -> tare around z*/
+/*Vector to tare: 0 -> rotation vector; 1-> game vector; 2 -> geo vectot*/
+
 void BNO085_Command_TareNow(BNO085 *myIMU, uint8_t axesToTare, uint8_t vectorToTare)
 {
 	myIMU->BNO085_Send_Buffer[0]=16;
@@ -748,6 +841,133 @@ void BNO085_Command_TareNow(BNO085 *myIMU, uint8_t axesToTare, uint8_t vectorToT
 		
 	myIMU->BNO085_Send_Buffer[8]=axesToTare;
 	myIMU->BNO085_Send_Buffer[9]=vectorToTare;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+/*Writes to FRS the current tare*/
+void BNO085_Command_PersistTare(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_TARE;
+	myIMU->BNO085_Send_Buffer[7]=0x01;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+
+void BNO085_Command_SetReorientation(BNO085 *myIMU, double quatX, double quatY, double quatZ, double quatW)
+{
+	int16_t quatMSB, quatLSB;
+	int32_t convertedQuaternion;
+	
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_TARE;
+	myIMU->BNO085_Send_Buffer[7]=0x02;
+	
+	convertedQuaternion= floatToQ(quatX, 14);
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
+	myIMU->BNO085_Send_Buffer[8]=quatLSB;
+	myIMU->BNO085_Send_Buffer[9]=quatMSB;
+
+	convertedQuaternion= floatToQ(quatY, 14);
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
+	myIMU->BNO085_Send_Buffer[10]=quatLSB;
+	myIMU->BNO085_Send_Buffer[11]=quatMSB;
+
+	convertedQuaternion= floatToQ(quatZ, 14);
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
+	myIMU->BNO085_Send_Buffer[12]=quatLSB;
+	myIMU->BNO085_Send_Buffer[13]=quatMSB;
+	
+	convertedQuaternion= floatToQ(quatW, 14);
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
+	myIMU->BNO085_Send_Buffer[14]=quatLSB;
+	myIMU->BNO085_Send_Buffer[15]=quatMSB;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+void BNO085_Command_Initialize(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_INITIALIZE;
+	myIMU->BNO085_Send_Buffer[7]=0x01;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+void BNO085_Command_SaveDCD(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_SAVE_DCD;
+	myIMU->BNO085_Send_Buffer[7]=0;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
 	myIMU->BNO085_Send_Buffer[10]=0;
 	myIMU->BNO085_Send_Buffer[11]=0;
 
@@ -822,6 +1042,113 @@ void BNO085_Command_DisableFullCalibration(BNO085 *myIMU)
 	BNO085_Command_ConfigureCalibration(myIMU,0,0,0,0);
 	return;
 }
+
+void BNO085_Command_EnableAutoSaveDCD(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_CONFIGURE_DCD;
+	myIMU->BNO085_Send_Buffer[7]=0x01;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}	
+void BNO085_Command_DisableAutoSaveDCD(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_CONFIGURE_DCD;
+	myIMU->BNO085_Send_Buffer[7]=0x00;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}	
+
+void BNO085_Command_GetOscType(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_OSCILLATOR;
+	myIMU->BNO085_Send_Buffer[7]=0;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}	
+
+void BNO085_Command_ClearResetDCD(BNO085 *myIMU)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+		
+	myIMU->BNO085_Send_Buffer[4]=SHTP_COMMAND_REQUEST;
+	myIMU->BNO085_Send_Buffer[5]=myIMU->commandSequenceNumber;
+	myIMU->commandSequenceNumber++;
+	myIMU->BNO085_Send_Buffer[6]=SHTP_COMMAND_ID_CLEAR_DCD;
+	myIMU->BNO085_Send_Buffer[7]=0;
+		
+	myIMU->BNO085_Send_Buffer[8]=0;
+	myIMU->BNO085_Send_Buffer[9]=0;
+	myIMU->BNO085_Send_Buffer[10]=0;
+	myIMU->BNO085_Send_Buffer[11]=0;
+
+	myIMU->BNO085_Send_Buffer[12]=0;
+	myIMU->BNO085_Send_Buffer[13]=0;
+	myIMU->BNO085_Send_Buffer[14]=0;
+	myIMU->BNO085_Send_Buffer[15]=0;
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}	
 
 void BNO085_GetCommandResponse(BNO085 *myIMU, uint16_t length)
 {
