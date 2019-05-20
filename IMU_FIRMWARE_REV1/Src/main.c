@@ -50,15 +50,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-	uint8_t count=0;
+	uint8_t sendCommand=0;
 	BNO085 myIMU;
-	uint16_t length=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void LED_blink(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -99,32 +98,18 @@ int main(void)
   MX_CAN1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-				
-	HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);
-	
-	while (count<5)
-	{
-			HAL_Delay(100);
-			HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);	
-			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_SET);	
-			HAL_Delay(100);
-			HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_RESET);	
-			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);	
-			count++;	
-	}
+	LED_blink();
 	
 	myIMU=BNO085_CreateIMU(&hi2c1, BNO085_ADDRESS, GPIOC, RESET_IMU_Pin, GPIOC, nBOOT_IMU_Pin);
 	BNO085_HardReset(&myIMU);
 	
 	HAL_Delay(250);
+	
 	if (BNO085_IsAlive(&myIMU)==0)
 	{
 		HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);
 	}
+	
 	HAL_Delay(50);
 	BNO085_FlushI2C(&myIMU);
 	HAL_Delay(50);
@@ -147,9 +132,6 @@ int main(void)
 	BNO085_EnableRawGyroscope(&myIMU, 10);
 	BNO085_EnableRawMagnetometer(&myIMU, 10);
 	
-	BNO085_Product_ID_Request(&myIMU);
-	BNO085_UpdateSensorReading(&myIMU);
-	
 	canStart();
 	HAL_TIM_Base_Start_IT(&htim6);
 	
@@ -163,12 +145,41 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		BNO085_UpdateSensorReading(&myIMU);
-		if (count==1)
+		
+		if (sendCommand!=0)
 		{
-			BNO085_Command_TareNow(&myIMU,0x07,1);
-			count=0;
+			switch (sendCommand)
+			{
+				case 1:
+					BNO085_Command_EnableFullCalibration(&myIMU);
+				break;
+				case 2:
+					BNO085_Command_DisableFullCalibration(&myIMU);
+				break;
+				case 3:
+					BNO085_Command_TareNow(&myIMU, 0x07, 0x00);
+				break;
+				case 4:
+					BNO085_Command_SetReorientation(&myIMU, 1, 0, 0, 0);
+				break;
+				case 5:
+					BNO085_Command_PersistTare(&myIMU);
+				break;
+				case 6:
+					BNO085_Command_GetOscType(&myIMU);
+				break;
+				case 7:
+					BNO085_Command_Initialize(&myIMU);
+				break;
+				case 8:
+					BNO085_Command_PersistTare(&myIMU);
+				break;
+				default:
+					
+				break;
+			}
+			sendCommand=0;
 		}
-		/*canSendDebug();*/
   }
   /* USER CODE END 3 */
 }
@@ -223,6 +234,27 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 	if (htim->Instance==TIM6)
 	{
 		canSendIMUPacket(&myIMU);
+	}
+}
+
+void LED_blink(void)
+{
+	uint8_t count=0;
+	HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);
+	
+	while (count<5)
+	{
+			HAL_Delay(100);
+			HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);	
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_SET);	
+			HAL_Delay(100);
+			HAL_GPIO_WritePin(GPIOC, LED_DEBUG_1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_RESET);	
+			HAL_GPIO_WritePin(GPIOB, LED_DEBUG_3_Pin, GPIO_PIN_RESET);	
+			count++;	
 	}
 }
 /* USER CODE END 4 */

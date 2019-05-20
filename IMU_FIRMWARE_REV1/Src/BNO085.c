@@ -9,27 +9,27 @@ eulerType quaternionToEuler (quaternionType quaternion)
 	float sqi,sqj,sqk;
 	float test;
 
-	test = quaternion.qi*quaternion.qj + quaternion.qk*quaternion.qw;
+	test = quaternion.qk*quaternion.qj + quaternion.qi*quaternion.qw;
 
 	if (test > THRESHOLD) 
 	{
-		output.yaw = 2 * atan2(quaternion.qi,quaternion.qw);
+		output.roll = 2 * atan2(quaternion.qk,quaternion.qw);
 		output.pitch = M_PI/2;
-		output.roll = 0;
-		output.yaw = radToDeg(output.yaw);
-		output.pitch = radToDeg(output.pitch);
+		output.yaw = 0;
 		output.roll = radToDeg(output.roll);
+		output.pitch = radToDeg(output.pitch);
+		output.yaw = radToDeg(output.yaw);
 		return output;
 	}
 
 	if (test < -THRESHOLD)
 	{
-		output.yaw = -2 * atan2(quaternion.qi,quaternion.qw);
+		output.roll = -2 * atan2(quaternion.qk,quaternion.qw);
 		output.pitch = - M_PI/2;
-		output.roll = 0;
-		output.yaw = radToDeg(output.yaw);
-		output.pitch = radToDeg(output.pitch);
+		output.yaw = 0;
 		output.roll = radToDeg(output.roll);
+		output.pitch = radToDeg(output.pitch);
+		output.yaw = radToDeg(output.yaw);
 		return output;
 	}
 
@@ -37,16 +37,17 @@ eulerType quaternionToEuler (quaternionType quaternion)
   sqj = quaternion.qj*quaternion.qj;
   sqk = quaternion.qk*quaternion.qk;
 
-  output.yaw = atan2(2*quaternion.qj*quaternion.qw-2*quaternion.qi*quaternion.qk , 1 - 2*sqj - 2*sqk);
+  output.roll = atan2(2*quaternion.qj*quaternion.qw-2*quaternion.qk*quaternion.qi , 1 - 2*sqj - 2*sqi);
 	output.pitch = asin(2*test);
-	output.roll = atan2(2*quaternion.qi*quaternion.qw-2*quaternion.qj*quaternion.qk , 1 - 2*sqi - 2*sqk);
-	output.yaw = radToDeg(output.yaw);
-	output.pitch = radToDeg(output.pitch);
+	output.yaw = atan2(2*quaternion.qk*quaternion.qw-2*quaternion.qj*quaternion.qi , 1 - 2*sqk - 2*sqi);
 	output.roll = radToDeg(output.roll);
+	output.pitch = radToDeg(output.pitch);
+	output.yaw = radToDeg(output.yaw);
 	
-
 	return output;
 }
+
+
 
 /*Conversion from radians to degrees*/
 float radToDeg(float angle)

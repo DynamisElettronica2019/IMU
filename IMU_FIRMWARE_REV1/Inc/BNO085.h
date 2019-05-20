@@ -49,7 +49,7 @@
 #define SHTP_COMMAND_ID_CLEAR_DCD 0x0B
 
 /*Quaternion conversion defines*/
-#define THRESHOLD 0.499f
+#define THRESHOLD 0.499999f
 #define M_PI 3.14159265358979323846f
 
 
