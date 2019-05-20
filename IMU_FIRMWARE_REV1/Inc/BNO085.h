@@ -7,6 +7,8 @@
 
 #define BNO085_BUFFER_LENGTH 50
 #define BNO085_DEBUG_BUFFER_LENGTH 30
+#define BNO085_FRS_BUFFER_LENGTH 100
+
 
 #define CHANNEL_COMMAND	0
 #define CHANNEL_EXECUTABLE	1
@@ -29,8 +31,6 @@
 
 #define SHTP_COMMAND_RESPONSE 0xF1
 #define SHTP_COMMAND_REQUEST 0xF2
-#define SHTP_FRS_READ_RESPONSE 0xF3
-#define SHTP_FRS_READ_REQUEST 0xF4
 #define SHTP_PRODUCT_ID_RESPONSE 0xF8
 #define SHTP_PRODUCT_ID_REQUEST 0xF9
 #define SHTP_BASE_TIMESTAMP 0xFB
@@ -47,6 +47,12 @@
 #define SHTP_COMMAND_ID_CONFIGURE_DCD 0x09
 #define SHTP_COMMAND_ID_OSCILLATOR 0x0A
 #define SHTP_COMMAND_ID_CLEAR_DCD 0x0B
+
+#define SHTP_FRS_WRITE_REQUEST_ID 0xF7
+#define SHTP_FRS_WRITE_DATA_REQUEST_ID 0xF6
+#define SHTP_FRS_WRITE_RESPONSE_ID 0xF5
+#define SHTP_FRS_READ_REQUEST_ID 0xF4
+#define SHTP_FRS_READ_RESPONSE_ID 0xF3
 
 /*Quaternion conversion defines*/
 #define THRESHOLD 0.499999f
@@ -129,9 +135,12 @@ typedef struct
 	uint8_t commandSequenceNumber;														/*Command sequence number*/
 	fullSensorReadingType sensor_readings;										/*Stores the readings of the sensors. Updated every time the update sensor reading function is called*/
 	uint8_t sensorsEnabled[23];																/*sensorsEnabled[ID_SENSOR]= 0 -> not enabled, 1 -> enabled*/
-	uint8_t BNO085_FRS_Buffer[BNO085_DEBUG_BUFFER_LENGTH];		/*Buffer used for FRS reads, FRS write responses*/
 	uint8_t BNO085_Product_ID_Buffer[BNO085_DEBUG_BUFFER_LENGTH];
 	uint8_t BNO085_Command_Buffer[BNO085_DEBUG_BUFFER_LENGTH];/*Buffer used for Command Responses*/
+	
+	uint32_t BNO085_FRS_Read_Buffer[BNO085_FRS_BUFFER_LENGTH];		/*Buffer used for FRS reads, FRS write responses*/
+	uint32_t BNO085_FRS_Write_Buffer[BNO085_FRS_BUFFER_LENGTH];		/*Buffer used for FRS reads, FRS write responses*/
+	
 }BNO085;
 
 /*Math functions*/
@@ -187,6 +196,7 @@ rawSensorsDataType BNO085_GetRawMagnetometer(BNO085 *myIMU);
 
 /*Product ID request*/
 void BNO085_Product_ID_Request (BNO085 *myIMU);
+
 void BNO085_GetProductID(BNO085 *myIMU, uint16_t length);
 
 /*Command functions*/
@@ -217,5 +227,16 @@ void BNO085_Command_ClearResetDCD(BNO085 *myIMU);
 
 /*Command parsing*/
 void BNO085_GetCommandResponse(BNO085 *myIMU, uint16_t length);
+
+/*FRS basic communication*/
+uint8_t BNO085_FRS_PerformWriteOperation (BNO085 *myIMU, uint16_t wordsToWrite, uint16_t FRSType, uint16_t initialOffset);
+void BNO085_FRS_InitializeWriteRequest(BNO085 *myIMU, uint16_t length, uint16_t FRSType);
+void BNO085_FRS_WriteData_Request (BNO085 *myIMU, uint16_t offset, uint32_t data0, uint32_t data1);
+
+uint8_t BNO085_FRS_ReadRequest (BNO085 *myIMU, uint16_t offset, uint16_t FRSType, uint16_t numberOfWords);
+void BNO085_FRS_GetReadResponse (BNO085 *myIMU, uint32_t *data0, uint32_t *data1);
+
+/*FRS requests*/
+uint8_t BNO085_FRS_RequestOrientation(BNO085* myIMU);
 
 #endif

@@ -52,6 +52,7 @@
 /* USER CODE BEGIN PV */
 	uint8_t sendCommand=0;
 	BNO085 myIMU;
+	uint8_t readResult;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,6 +117,8 @@ int main(void)
 	BNO085_FlushI2C(&myIMU);
 	HAL_Delay(50);
 
+	readResult = BNO085_FRS_RequestOrientation(&myIMU);
+	
 	/*Enable sensor reports functions*/
 	BNO085_Command_EnableFullCalibration(&myIMU);
 	BNO085_UpdateSensorReading(&myIMU);
@@ -173,6 +176,18 @@ int main(void)
 				break;
 				case 8:
 					BNO085_Command_PersistTare(&myIMU);
+				break;
+				case 9:
+					BNO085_Command_ConfigureCalibration(&myIMU, 1, 0, 0, 0);
+				break;
+				case 10:
+					BNO085_Command_ConfigureCalibration(&myIMU, 0, 0, 0, 1);
+				break;
+				case 11:
+					BNO085_Command_SetReorientation(&myIMU, 0, 0, 0, 0);
+				break;
+				case 12:
+					BNO085_Command_SaveDCD(&myIMU);
 				break;
 				default:
 					

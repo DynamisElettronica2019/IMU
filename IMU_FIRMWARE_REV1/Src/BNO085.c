@@ -120,7 +120,6 @@ BNO085 BNO085_CreateIMU (I2C_HandleTypeDef *hi2cx, uint8_t address, GPIO_TypeDef
 	while (i<BNO085_DEBUG_BUFFER_LENGTH)
 	{
 		myIMU.BNO085_Command_Buffer[i]=0;
-		myIMU.BNO085_FRS_Buffer[i]=0;
 		myIMU.BNO085_Product_ID_Buffer[i]=0;
 		i++;
 	}
@@ -900,28 +899,28 @@ void BNO085_Command_SetReorientation(BNO085 *myIMU, double quatX, double quatY, 
 	myIMU->BNO085_Send_Buffer[7]=0x02;
 	
 	convertedQuaternion= floatToQ(quatX, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
-	myIMU->BNO085_Send_Buffer[8]=quatLSB;
-	myIMU->BNO085_Send_Buffer[9]=quatMSB;
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	myIMU->BNO085_Send_Buffer[8]=(int8_t)quatLSB;
+	myIMU->BNO085_Send_Buffer[9]=(int8_t)quatMSB;
 
 	convertedQuaternion= floatToQ(quatY, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
-	myIMU->BNO085_Send_Buffer[10]=quatLSB;
-	myIMU->BNO085_Send_Buffer[11]=quatMSB;
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	myIMU->BNO085_Send_Buffer[10]=(int8_t)quatLSB;
+	myIMU->BNO085_Send_Buffer[11]=(int8_t)quatMSB;
 
 	convertedQuaternion= floatToQ(quatZ, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
-	myIMU->BNO085_Send_Buffer[12]=quatLSB;
-	myIMU->BNO085_Send_Buffer[13]=quatMSB;
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	myIMU->BNO085_Send_Buffer[12]=(int8_t)quatLSB;
+	myIMU->BNO085_Send_Buffer[13]=(int8_t)quatMSB;
 	
 	convertedQuaternion= floatToQ(quatW, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFFFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFFFF;
-	myIMU->BNO085_Send_Buffer[14]=quatLSB;
-	myIMU->BNO085_Send_Buffer[15]=quatMSB;
+	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
+	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	myIMU->BNO085_Send_Buffer[14]=(int8_t)quatLSB;
+	myIMU->BNO085_Send_Buffer[15]=(int8_t)quatMSB;
 	
 	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
 }
@@ -1167,4 +1166,191 @@ void BNO085_GetCommandResponse(BNO085 *myIMU, uint16_t length)
 	}
 	
 	return;
+}
+
+/*FRS functions*/
+
+uint8_t BNO085_FRS_PerformWriteOperation (BNO085 *myIMU, uint16_t wordsToWrite, uint16_t FRSType, uint16_t initialOffset)
+{
+	uint16_t currentOffset, dataLength;
+	uint8_t initializeResponse=255, currentWriteResponse=255, writeCount=0;
+	
+	BNO085_FRS_InitializeWriteRequest(myIMU, wordsToWrite, FRSType);
+
+	while (initializeResponse!=0)
+	{
+		dataLength = BNO085_DataAvailable(myIMU);
+		while (dataLength==0)
+		{
+			dataLength = BNO085_DataAvailable(myIMU);
+		}
+		
+		BNO085_ReceiveData(myIMU, dataLength);
+		if (myIMU->BNO085_Receive_Buffer[4] == SHTP_FRS_WRITE_RESPONSE_ID)
+		{
+			initializeResponse=0;
+		}
+	}
+	if (myIMU->BNO085_Receive_Buffer[5]!=4)
+	{
+		return 1;
+	}
+	currentOffset=initialOffset;
+	
+	while ((wordsToWrite-currentOffset)>0)
+	{
+		BNO085_FRS_WriteData_Request (myIMU, currentOffset, myIMU->BNO085_FRS_Write_Buffer[writeCount], myIMU->BNO085_FRS_Write_Buffer[writeCount+1]);
+		writeCount=writeCount+2;
+		currentOffset = currentOffset+2;
+		currentWriteResponse=255;
+		while (currentWriteResponse!=0)
+		{
+			dataLength = BNO085_DataAvailable(myIMU);
+			while (dataLength==0)
+			{
+				dataLength = BNO085_DataAvailable(myIMU);
+			}
+			
+			BNO085_ReceiveData(myIMU, dataLength);
+			if (myIMU->BNO085_Receive_Buffer[4] == SHTP_FRS_WRITE_RESPONSE_ID)
+			{
+				currentWriteResponse=0;
+			}
+		}
+		if (myIMU->BNO085_Receive_Buffer[5]!=0 && myIMU->BNO085_Receive_Buffer[5]!=3)
+		{
+			return 1;
+		}
+	}
+	if (myIMU->BNO085_Receive_Buffer[5]==3)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+void BNO085_FRS_InitializeWriteRequest(BNO085 *myIMU, uint16_t length, uint16_t FRSType)
+{
+	myIMU->BNO085_Send_Buffer[0]=10;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+	
+	myIMU->BNO085_Send_Buffer[4]=SHTP_FRS_WRITE_REQUEST_ID;
+	myIMU->BNO085_Send_Buffer[5]=0;
+	myIMU->BNO085_Send_Buffer[6]=((uint8_t)(length & 0xFF));
+	myIMU->BNO085_Send_Buffer[7]=((uint8_t)((length>>8) & 0xFF));
+	
+	myIMU->BNO085_Send_Buffer[8]=((uint8_t)(FRSType & 0xFF));
+	myIMU->BNO085_Send_Buffer[9]=((uint8_t)((FRSType>>8) & 0xFF));
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,10, 1000);
+}
+
+void BNO085_FRS_WriteData_Request (BNO085 *myIMU, uint16_t offset, uint32_t data0, uint32_t data1)
+{
+	myIMU->BNO085_Send_Buffer[0]=16;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+	
+	myIMU->BNO085_Send_Buffer[4]=SHTP_FRS_WRITE_DATA_REQUEST_ID;
+	myIMU->BNO085_Send_Buffer[5]=0;
+	myIMU->BNO085_Send_Buffer[6]=((uint8_t)(offset & 0xFF));
+	myIMU->BNO085_Send_Buffer[7]=((uint8_t)((offset>>8) & 0xFF));
+	
+	myIMU->BNO085_Send_Buffer[8]=((uint8_t)(data0 & 0xFF));
+	myIMU->BNO085_Send_Buffer[9]=((uint8_t)((data0>>8) & 0xFF));
+	myIMU->BNO085_Send_Buffer[10]=((uint8_t)((data0>>16) & 0xFF));
+	myIMU->BNO085_Send_Buffer[11]=((uint8_t)((data0>>24) & 0xFF));
+
+	myIMU->BNO085_Send_Buffer[12]=((uint8_t)(data1 & 0xFF));
+	myIMU->BNO085_Send_Buffer[13]=((uint8_t)((data1>>8) & 0xFF));
+	myIMU->BNO085_Send_Buffer[14]=((uint8_t)((data1>>16) & 0xFF));
+	myIMU->BNO085_Send_Buffer[15]=((uint8_t)((data1>>24) & 0xFF));
+		
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,16, 1000);
+}
+
+uint8_t BNO085_FRS_ReadRequest (BNO085 *myIMU, uint16_t offset, uint16_t FRSType, uint16_t numberOfWords)
+{
+	uint16_t counter, dataLength;
+	uint8_t status;
+	
+	myIMU->BNO085_Send_Buffer[0]=12;
+	myIMU->BNO085_Send_Buffer[1]=0;
+	myIMU->BNO085_Send_Buffer[2]=CHANNEL_CONTROL;
+	myIMU->BNO085_Send_Buffer[3]=myIMU->sequenceNumber[CHANNEL_CONTROL];
+	myIMU->sequenceNumber[CHANNEL_CONTROL]++;
+	
+	myIMU->BNO085_Send_Buffer[4]=SHTP_FRS_READ_REQUEST_ID;
+	myIMU->BNO085_Send_Buffer[5]=0;
+	myIMU->BNO085_Send_Buffer[6]=((uint8_t)(offset & 0xFF));
+	myIMU->BNO085_Send_Buffer[7]=((uint8_t)((offset>>8) & 0xFF));
+	
+	myIMU->BNO085_Send_Buffer[8]=((uint8_t)(FRSType & 0xFF));
+	myIMU->BNO085_Send_Buffer[9]=((uint8_t)((FRSType>>8) & 0xFF));
+	myIMU->BNO085_Send_Buffer[10]=((uint8_t)(numberOfWords & 0xFF));
+	myIMU->BNO085_Send_Buffer[11]=((uint8_t)((numberOfWords>>8) & 0xFF));
+	
+	HAL_I2C_Master_Transmit(myIMU->hi2cx, myIMU->address, myIMU->BNO085_Send_Buffer,12, 1000);
+	
+	counter = 0;
+	while (counter<numberOfWords)
+	{
+		dataLength = BNO085_DataAvailable(myIMU);
+		while (dataLength==0)
+		{
+			dataLength = BNO085_DataAvailable(myIMU);
+		}
+		
+		BNO085_ReceiveData(myIMU, dataLength);
+		if (myIMU->BNO085_Receive_Buffer[4] == SHTP_FRS_READ_RESPONSE_ID)
+		{
+			status = myIMU->BNO085_Receive_Buffer[5] & 0x07;
+			if ((status!=0 && status != 3)&&(status!=6 && status!=7))
+			{
+				return 1;
+			}
+			else 
+			{
+				BNO085_FRS_GetReadResponse(myIMU, &(myIMU->BNO085_FRS_Read_Buffer[counter]),&(myIMU->BNO085_FRS_Read_Buffer[counter+1]));
+				if (counter+1 >= numberOfWords)
+				{
+					myIMU->BNO085_FRS_Read_Buffer[counter+1]=0;
+				}
+			}
+			counter = counter+2;
+		}
+	}
+	return 0;
+}
+
+void BNO085_FRS_GetReadResponse (BNO085 *myIMU, uint32_t *data0, uint32_t *data1)
+{
+	uint8_t length;
+	length = myIMU->BNO085_Receive_Buffer[5]>>3;
+	*data0=0;
+	*data1=1;
+	if (length>0)
+	{
+		*data0 = (myIMU->BNO085_Receive_Buffer[10]<<24)|(myIMU->BNO085_Receive_Buffer[11]<<16)|(myIMU->BNO085_Receive_Buffer[9]<<8)|(myIMU->BNO085_Receive_Buffer[8]);
+	}
+	if (length>1)
+	{
+		*data1 = (myIMU->BNO085_Receive_Buffer[15]<<24)|(myIMU->BNO085_Receive_Buffer[14]<<16)|(myIMU->BNO085_Receive_Buffer[13]<<8)|(myIMU->BNO085_Receive_Buffer[12]);		
+	}
+	return;
+}
+
+uint8_t BNO085_FRS_RequestOrientation(BNO085* myIMU)
+{
+	uint8_t result;
+	result = BNO085_FRS_ReadRequest(myIMU, 0, 0x2D3E, 4);
+	return result;
 }

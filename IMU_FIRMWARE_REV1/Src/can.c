@@ -184,7 +184,7 @@ void canSendIMUPacket(BNO085 *myIMU)
 	gyrY = ((myIMU->sensor_readings.angular.Y)*10.00f);
 	gyrZ = ((myIMU->sensor_readings.angular.Z)*10.00f);
 	
-	heading = ((myIMU->sensor_readings.absoluteOrientation.orientation.pitch)*100.00f);
+	heading = ((myIMU->sensor_readings.absoluteOrientation.orientation.yaw)*100.00f);
 	
 	#ifdef IMU_1
 	CAN_send(IMU1_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
