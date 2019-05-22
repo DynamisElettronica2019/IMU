@@ -116,7 +116,7 @@ int main(void)
 	HAL_Delay(50);
 	BNO085_FlushI2C(&myIMU);
 	HAL_Delay(50);
-
+	
 	readResult = BNO085_FRS_RequestOrientation(&myIMU);
 	
 	/*Enable sensor reports functions*/
@@ -137,7 +137,6 @@ int main(void)
 	
 	canStart();
 	HAL_TIM_Base_Start_IT(&htim6);
-	
   /* USER CODE END 2 */
 
   /* Infinite loop */

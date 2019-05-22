@@ -151,17 +151,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>myIMU,0x10</ItemText>
+          <ItemText>myIMU,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>length</ItemText>
+          <ItemText>readResult</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>length</ItemText>
+          <ItemText>sendCommand</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

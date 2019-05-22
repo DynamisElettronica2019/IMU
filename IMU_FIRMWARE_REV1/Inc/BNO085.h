@@ -9,7 +9,6 @@
 #define BNO085_DEBUG_BUFFER_LENGTH 30
 #define BNO085_FRS_BUFFER_LENGTH 100
 
-
 #define CHANNEL_COMMAND	0
 #define CHANNEL_EXECUTABLE	1
 #define CHANNEL_CONTROL 2
@@ -148,7 +147,8 @@ eulerType quaternionToEuler (quaternionType quaternion);
 float radToDeg(float angle);
 quaternionType populateQuaternion (int16_t real, int16_t i, int16_t j, int16_t k);
 float qToFloat(int16_t fixedPointValue, uint8_t qPoint);
-int32_t floatToQ (double realToConvert, uint8_t qPoint);
+int16_t floatToQ (double realToConvert, uint8_t qPoint);
+
 /*This funcition creates and initializes a new BNO085 object. It returns a pointer to the object. If boot is not used, pass NULL to the GPIO_TypeDef argument*/
 BNO085 BNO085_CreateIMU (I2C_HandleTypeDef *hi2cx, uint8_t address, GPIO_TypeDef *reset_GPIOx, uint16_t reset_Pin, GPIO_TypeDef *boot_GPIOx, uint16_t nBOOT_Pin);
 

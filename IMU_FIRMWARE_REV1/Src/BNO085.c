@@ -77,11 +77,11 @@ float qToFloat(int16_t fixedPointValue, uint8_t qPoint)
 	return (qFloat);
 }
 
-int32_t floatToQ (double realToConvert, uint8_t qPoint)
+int16_t floatToQ (double realToConvert, uint8_t qPoint)
 {
-	int32_t qFormatNumber;
+	int16_t qFormatNumber;
 	realToConvert=realToConvert*pow(2,qPoint);
-	qFormatNumber=(int32_t)realToConvert;
+	qFormatNumber=(int16_t)realToConvert;
 	return qFormatNumber;
 }
 
@@ -123,6 +123,14 @@ BNO085 BNO085_CreateIMU (I2C_HandleTypeDef *hi2cx, uint8_t address, GPIO_TypeDef
 		myIMU.BNO085_Product_ID_Buffer[i]=0;
 		i++;
 	}
+	i=0;
+	while (i<BNO085_FRS_BUFFER_LENGTH)
+	{
+		myIMU.BNO085_FRS_Read_Buffer[i]=0;
+		myIMU.BNO085_FRS_Write_Buffer[i]=0;
+		i++;
+	}
+
 	myIMU.commandSequenceNumber=0;
 	
 	return myIMU;
@@ -884,7 +892,7 @@ void BNO085_Command_PersistTare(BNO085 *myIMU)
 void BNO085_Command_SetReorientation(BNO085 *myIMU, double quatX, double quatY, double quatZ, double quatW)
 {
 	int16_t quatMSB, quatLSB;
-	int32_t convertedQuaternion;
+	int16_t convertedQuaternion;
 	
 	myIMU->BNO085_Send_Buffer[0]=16;
 	myIMU->BNO085_Send_Buffer[1]=0;
@@ -899,26 +907,26 @@ void BNO085_Command_SetReorientation(BNO085 *myIMU, double quatX, double quatY, 
 	myIMU->BNO085_Send_Buffer[7]=0x02;
 	
 	convertedQuaternion= floatToQ(quatX, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	quatLSB = ((int8_t) convertedQuaternion) & 0xFF;
+	quatMSB = (int8_t) (convertedQuaternion >> 8)&0xFF;
 	myIMU->BNO085_Send_Buffer[8]=(int8_t)quatLSB;
 	myIMU->BNO085_Send_Buffer[9]=(int8_t)quatMSB;
 
 	convertedQuaternion= floatToQ(quatY, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	quatLSB = ((int8_t) convertedQuaternion) & 0xFF;
+	quatMSB = (int8_t)(convertedQuaternion >> 8)&0xFF;
 	myIMU->BNO085_Send_Buffer[10]=(int8_t)quatLSB;
 	myIMU->BNO085_Send_Buffer[11]=(int8_t)quatMSB;
 
 	convertedQuaternion= floatToQ(quatZ, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	quatLSB = ((int8_t) convertedQuaternion) & 0xFF;
+	quatMSB = (int8_t) (convertedQuaternion >> 8)&0xFF;
 	myIMU->BNO085_Send_Buffer[12]=(int8_t)quatLSB;
 	myIMU->BNO085_Send_Buffer[13]=(int8_t)quatMSB;
 	
 	convertedQuaternion= floatToQ(quatW, 14);
-	quatLSB = ((int16_t) convertedQuaternion) & 0xFF;
-	quatMSB = ((int16_t) convertedQuaternion >> 8)&0xFF;
+	quatLSB = ((int8_t) convertedQuaternion) & 0xFF;
+	quatMSB = (int8_t)(convertedQuaternion >> 8)&0xFF;
 	myIMU->BNO085_Send_Buffer[14]=(int8_t)quatLSB;
 	myIMU->BNO085_Send_Buffer[15]=(int8_t)quatMSB;
 	
@@ -1339,7 +1347,7 @@ void BNO085_FRS_GetReadResponse (BNO085 *myIMU, uint32_t *data0, uint32_t *data1
 	*data1=1;
 	if (length>0)
 	{
-		*data0 = (myIMU->BNO085_Receive_Buffer[10]<<24)|(myIMU->BNO085_Receive_Buffer[11]<<16)|(myIMU->BNO085_Receive_Buffer[9]<<8)|(myIMU->BNO085_Receive_Buffer[8]);
+		*data0 = (myIMU->BNO085_Receive_Buffer[11]<<24)|(myIMU->BNO085_Receive_Buffer[10]<<16)|(myIMU->BNO085_Receive_Buffer[9]<<8)|(myIMU->BNO085_Receive_Buffer[8]);
 	}
 	if (length>1)
 	{
