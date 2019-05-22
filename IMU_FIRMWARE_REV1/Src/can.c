@@ -177,14 +177,14 @@ void canSendIMUPacket(BNO085 *myIMU)
 	int16_t heading, accZ, gyrY; /*Second packet*/
 	
 	accX = (int16_t)((myIMU->sensor_readings.acceleration.X)*100.00f);
-	accY = ((myIMU->sensor_readings.acceleration.Y)*100.00f);
-	accZ = ((myIMU->sensor_readings.acceleration.Z)*100.00f);
+	accY = (int16_t)((myIMU->sensor_readings.acceleration.Y)*100.00f);
+	accZ = (int16_t)((myIMU->sensor_readings.acceleration.Z)*100.00f);
 	
-	gyrX = ((myIMU->sensor_readings.angular.X)*10.00f);
-	gyrY = ((myIMU->sensor_readings.angular.Y)*10.00f);
-	gyrZ = ((myIMU->sensor_readings.angular.Z)*10.00f);
+	gyrX = (int16_t)((myIMU->sensor_readings.angular.X)*10.00f);
+	gyrY = (int16_t)((myIMU->sensor_readings.angular.Y)*10.00f);
+	gyrZ = (int16_t)((myIMU->sensor_readings.angular.Z)*10.00f);
 	
-	heading = ((myIMU->sensor_readings.absoluteOrientation.orientation.yaw)*100.00f);
+	heading = (int16_t)((myIMU->sensor_readings.absoluteOrientation.orientation.yaw)*100.00f);
 	
 	#ifdef IMU_1
 	CAN_send(IMU1_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);

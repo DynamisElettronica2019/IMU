@@ -1183,6 +1183,8 @@ uint8_t BNO085_FRS_PerformWriteOperation (BNO085 *myIMU, uint16_t wordsToWrite, 
 	uint16_t currentOffset, dataLength;
 	uint8_t initializeResponse=255, currentWriteResponse=255, writeCount=0;
 	
+	uint16_t trials = 0; /*This counter increments every time a trial fails. When it reaches the maximum number of allowed trials, it returns a timeout error 0x02*/
+	
 	BNO085_FRS_InitializeWriteRequest(myIMU, wordsToWrite, FRSType);
 
 	while (initializeResponse!=0)
@@ -1191,7 +1193,12 @@ uint8_t BNO085_FRS_PerformWriteOperation (BNO085 *myIMU, uint16_t wordsToWrite, 
 		while (dataLength==0)
 		{
 			dataLength = BNO085_DataAvailable(myIMU);
+			trials++;
+			if (trials>MAX_TRIALS) return 0x02;
 		}
+		
+		trials++;
+		if (trials>MAX_TRIALS) return 0x02;
 		
 		BNO085_ReceiveData(myIMU, dataLength);
 		if (myIMU->BNO085_Receive_Buffer[4] == SHTP_FRS_WRITE_RESPONSE_ID)
@@ -1205,18 +1212,31 @@ uint8_t BNO085_FRS_PerformWriteOperation (BNO085 *myIMU, uint16_t wordsToWrite, 
 	}
 	currentOffset=initialOffset;
 	
+	trials = 0;
 	while ((wordsToWrite-currentOffset)>0)
 	{
 		BNO085_FRS_WriteData_Request (myIMU, currentOffset, myIMU->BNO085_FRS_Write_Buffer[writeCount], myIMU->BNO085_FRS_Write_Buffer[writeCount+1]);
 		writeCount=writeCount+2;
 		currentOffset = currentOffset+2;
 		currentWriteResponse=255;
+		
+		trials++;
+		if (trials>MAX_TRIALS) return 0x02;
+		
 		while (currentWriteResponse!=0)
 		{
 			dataLength = BNO085_DataAvailable(myIMU);
+			
+			trials++;
+			if (trials>MAX_TRIALS) return 0x02;
+			
 			while (dataLength==0)
 			{
 				dataLength = BNO085_DataAvailable(myIMU);
+				
+				trials++;
+				if (trials>MAX_TRIALS) return 0x02;
+			
 			}
 			
 			BNO085_ReceiveData(myIMU, dataLength);
@@ -1289,6 +1309,7 @@ uint8_t BNO085_FRS_ReadRequest (BNO085 *myIMU, uint16_t offset, uint16_t FRSType
 {
 	uint16_t counter, dataLength;
 	uint8_t status;
+	uint16_t trials=0;
 	
 	myIMU->BNO085_Send_Buffer[0]=12;
 	myIMU->BNO085_Send_Buffer[1]=0;
@@ -1312,8 +1333,16 @@ uint8_t BNO085_FRS_ReadRequest (BNO085 *myIMU, uint16_t offset, uint16_t FRSType
 	while (counter<numberOfWords)
 	{
 		dataLength = BNO085_DataAvailable(myIMU);
+		
+		trials++;
+		if (trials>MAX_TRIALS) return 0x02;
+		
 		while (dataLength==0)
 		{
+			
+			trials++;
+			if (trials>MAX_TRIALS) return 0x02;
+			
 			dataLength = BNO085_DataAvailable(myIMU);
 		}
 		

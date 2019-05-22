@@ -3,7 +3,7 @@
 <title>Static Call Graph - [IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed May 22 19:28:25 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Wed May 22 22:50:49 2019
 <BR><P>
 <H3>Maximum Stack Usage =       2400 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -860,8 +860,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BNO085_FRS_ReadRequest
 </UL>
 
-<P><STRONG><a name="[9f]"></a>BNO085_FRS_ReadRequest</STRONG> (Thumb, 174 bytes, Stack size 32 bytes, bno085.o(i.BNO085_FRS_ReadRequest))
-<BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = BNO085_FRS_ReadRequest &rArr; BNO085_ReceiveData &rArr; HAL_I2C_Master_Receive &rArr; I2C_MasterRequestRead &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<P><STRONG><a name="[9f]"></a>BNO085_FRS_ReadRequest</STRONG> (Thumb, 212 bytes, Stack size 40 bytes, bno085.o(i.BNO085_FRS_ReadRequest))
+<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = BNO085_FRS_ReadRequest &rArr; BNO085_ReceiveData &rArr; HAL_I2C_Master_Receive &rArr; I2C_MasterRequestRead &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_I2C_Master_Transmit
 <LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BNO085_ReceiveData
@@ -872,7 +872,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a2]"></a>BNO085_FRS_RequestOrientation</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, bno085.o(i.BNO085_FRS_RequestOrientation))
-<BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = BNO085_FRS_RequestOrientation &rArr; BNO085_FRS_ReadRequest &rArr; BNO085_ReceiveData &rArr; HAL_I2C_Master_Receive &rArr; I2C_MasterRequestRead &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = BNO085_FRS_RequestOrientation &rArr; BNO085_FRS_ReadRequest &rArr; BNO085_ReceiveData &rArr; HAL_I2C_Master_Receive &rArr; I2C_MasterRequestRead &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BNO085_FRS_ReadRequest
 </UL>

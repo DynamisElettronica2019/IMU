@@ -57,6 +57,7 @@
 #define THRESHOLD 0.499999f
 #define M_PI 3.14159265358979323846f
 
+#define MAX_TRIALS 10000
 
 /*Angle typedefs*/
 typedef struct
