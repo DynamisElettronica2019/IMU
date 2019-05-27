@@ -45,6 +45,7 @@ void canStart(void);
 void canSendDebug(void);
 void canFilterConfig(void);
 void canSendIMUPacket(BNO085 *myIMU);
+void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int16_t fourthInt, uint8_t dlc_value);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

@@ -30,7 +30,6 @@ uint32_t packetMailbox;
 uint8_t dataPacket[8];
 uint8_t canReceivedMessageData0[8];
 uint8_t canReceivedMessageData1[8];
-
 CAN_TxHeaderTypeDef header;
 /* USER CODE END 0 */
 
@@ -127,29 +126,6 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 } 
 
 /* USER CODE BEGIN 1 */
-
-
-void CAN_send_unsigned(int ID, uint16_t firstInt, uint16_t secondInt, uint16_t thirdInt, uint16_t fourthInt, uint8_t dlc_value)
-{
-	uint32_t mailbox;
-	
-	header.StdId = ID;
-	header.RTR = CAN_RTR_DATA;
-	header.IDE = CAN_ID_STD;
-	header.DLC = dlc_value;
-	
-	dataPacket[0] = (uint8_t)((firstInt >> 8) & 0x00FF);
-  dataPacket[1] = (uint8_t)(firstInt & 0x00FF);
-  dataPacket[2] = (uint8_t)((secondInt >> 8) & 0x00FF);
-  dataPacket[3] = (uint8_t)(secondInt & 0x00FF);
-	dataPacket[4] = (uint8_t)((thirdInt >> 8) & 0x00FF);
-  dataPacket[5] = (uint8_t)(thirdInt & 0x00FF);
-  dataPacket[6] = (uint8_t)((fourthInt >> 8) & 0x00FF);
-  dataPacket[7] = (uint8_t)(fourthInt & 0x00FF);
-	
-  HAL_CAN_AddTxMessage(&hcan1, &header, dataPacket, &mailbox);
-}
-
 void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int16_t fourthInt, uint8_t dlc_value)
 {
 	uint32_t mailbox;
@@ -175,6 +151,7 @@ void canSendIMUPacket(BNO085 *myIMU)
 {
 	int16_t accX, accY, gyrX, gyrZ; /*First packet*/
 	int16_t heading, accZ, gyrY; /*Second packet*/
+	uint16_t calibrationStatus;
 	
 	accX = (int16_t)((myIMU->sensor_readings.acceleration.X)*100.00f);
 	accY = (int16_t)((myIMU->sensor_readings.acceleration.Y)*100.00f);
@@ -183,20 +160,24 @@ void canSendIMUPacket(BNO085 *myIMU)
 	gyrX = (int16_t)((myIMU->sensor_readings.angular.X)*10.00f);
 	gyrY = (int16_t)((myIMU->sensor_readings.angular.Y)*10.00f);
 	gyrZ = (int16_t)((myIMU->sensor_readings.angular.Z)*10.00f);
-	
+
 	heading = (int16_t)((myIMU->sensor_readings.absoluteOrientation.orientation.yaw)*100.00f);
+
+	calibrationStatus= (myIMU->sensor_readings.acceleration.status) | ((myIMU->sensor_readings.angular.status)<<2) | ((myIMU->sensor_readings.magneticField.status)<<4) | ((myIMU->sensor_readings.absoluteOrientation.status)<<6);
 	
 	#ifdef IMU_1
 	CAN_send(IMU1_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
-	CAN_send(IMU1_DATA_2_ID, heading, accZ, gyrY, 0, 6);
+	CAN_send(IMU1_DATA_2_ID, heading, accZ, gyrY, calibrationStatus, 8);
+	HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+	/*RED*/
 	#endif
 	
 	#ifdef IMU_2
 	CAN_send(IMU2_DATA_1_ID, accX, accY, gyrX, gyrZ, 8);
-	CAN_send(IMU2_DATA_2_ID, heading, accZ, gyrY, 0, 6);
-	#endif
-		HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
-	
+	CAN_send(IMU2_DATA_2_ID, heading, accZ, gyrY, calibrationStatus, 8);
+	HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
+	/*YELLOW*/
+	#endif	
 }
 
 extern void canStart(void)
