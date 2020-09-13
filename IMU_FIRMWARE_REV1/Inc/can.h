@@ -44,6 +44,9 @@ void canStart(void);
 void canSendDebug(void);
 void canFilterConfig(void);
 void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int16_t fourthInt, uint8_t dlc_value);
+
+void CAN_send_motorola (uint8_t* myArray, uint16_t ID, uint8_t dlc_value);
+void CAN_send_intel (uint8_t* myArray, uint16_t ID, uint8_t dlc_value);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

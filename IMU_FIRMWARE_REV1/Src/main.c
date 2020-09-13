@@ -39,6 +39,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+#define MEAS_ID 0x641
+#define STATUS_ID 0x640
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,9 +53,20 @@
 
 /* USER CODE BEGIN PV */
 
-advertiseMeasTypedef myAdvertiseMeas;
-advertiseSensorStatusTypedef myAdvertiseSensorStatus;
+advertiseMeasTypedef AdvertiseMeasFL;
+advertiseSensorStatusTypedef AdvertiseSensorStatusFL;
+
+advertiseMeasTypedef AdvertiseMeasFR;
+advertiseSensorStatusTypedef AdvertiseSensorStatusFR;
+
+advertiseMeasTypedef AdvertiseMeasRL;
+advertiseSensorStatusTypedef AdvertiseSensorStatusRL;
+
+advertiseMeasTypedef AdvertiseMeasRR;
+advertiseSensorStatusTypedef AdvertiseSensorStatusRR;
+
 uint8_t sendBuffer [8];
+uint8_t status=0;
 
 /* USER CODE END PV */
 
@@ -74,24 +88,74 @@ void LED_blink(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	myAdvertiseMeas.UID = 0xCACCA123;
-	myAdvertiseMeas.Pressure = 100;
-	myAdvertiseMeas.Measurement_Status = OUT_OF_RANGE;
-	myAdvertiseMeas.Temperature = 100;
-	myAdvertiseMeas.Service_Counter = 1;
 	
-	AdvertiseMeasToArray(myAdvertiseMeas,sendBuffer);
+	//Inizializzazione front left
+	AdvertiseMeasFL.UID = 0xCACCA000;
+	AdvertiseMeasFL.Pressure = 100;
+	AdvertiseMeasFL.Measurement_Status = IN_RANGE;
+	AdvertiseMeasFL.Temperature = 85;
+	AdvertiseMeasFL.Service_Counter = 0;
 	
-	myAdvertiseSensorStatus.UID = 0xCACCA123;
-	myAdvertiseSensorStatus.Location = RIGHT;
-	myAdvertiseSensorStatus.Axle = REAR;
-	myAdvertiseSensorStatus.Type = TYRE_MIDDLE;
-	myAdvertiseSensorStatus.RSSI = 15;
-	myAdvertiseSensorStatus.Mute = PSN_ADVERTISING;
-	myAdvertiseSensorStatus.Battery_Voltage = 255;
-	myAdvertiseSensorStatus.Service_Counter = 1;
+	AdvertiseSensorStatusFL.UID = 0xCACCA000;
+	AdvertiseSensorStatusFL.Location = LEFT;
+	AdvertiseSensorStatusFL.Axle = FRONT;
+	AdvertiseSensorStatusFL.Type = TYPE_UNDEFINED;
+	AdvertiseSensorStatusFL.RSSI = 15;
+	AdvertiseSensorStatusFL.Mute = PSN_ADVERTISING;
+	AdvertiseSensorStatusFL.Battery_Voltage = 255;
+	AdvertiseSensorStatusFL.Service_Counter = 0;
 	
-	AdvertiseSensorStatusToArray(myAdvertiseSensorStatus,sendBuffer);
+	//Inizializzazione front right
+	AdvertiseMeasFR.UID = 0xCACCA001;
+	AdvertiseMeasFR.Pressure = 120;
+	AdvertiseMeasFR.Measurement_Status = IN_RANGE;
+	AdvertiseMeasFR.Temperature = 70;
+	AdvertiseMeasFR.Service_Counter = 0;
+	
+	AdvertiseSensorStatusFR.UID = 0xCACCA001;
+	AdvertiseSensorStatusFR.Location = RIGHT;
+	AdvertiseSensorStatusFR.Axle = FRONT;
+	AdvertiseSensorStatusFR.Type = TYPE_UNDEFINED;
+	AdvertiseSensorStatusFR.RSSI = 15;
+	AdvertiseSensorStatusFR.Mute = PSN_ADVERTISING;
+	AdvertiseSensorStatusFR.Battery_Voltage = 250;
+	AdvertiseSensorStatusFR.Service_Counter = 0;
+	
+	//Inizializzazione rear left
+	
+	AdvertiseMeasRL.UID = 0xCACCA002;
+	AdvertiseMeasRL.Pressure = 90;
+	AdvertiseMeasRL.Measurement_Status = IN_RANGE;
+	AdvertiseMeasRL.Temperature = 120;
+	AdvertiseMeasRL.Service_Counter = 0;
+	
+	AdvertiseSensorStatusRL.UID = 0xCACCA002;
+	AdvertiseSensorStatusRL.Location = LEFT;
+	AdvertiseSensorStatusRL.Axle = REAR;
+	AdvertiseSensorStatusRL.Type = TYPE_UNDEFINED;
+	AdvertiseSensorStatusRL.RSSI = 15;
+	AdvertiseSensorStatusRL.Mute = PSN_ADVERTISING;
+	AdvertiseSensorStatusRL.Battery_Voltage = 200;
+	AdvertiseSensorStatusRL.Service_Counter = 0;
+	
+	//Inizializzazione rear right
+	
+	AdvertiseMeasRR.UID = 0xCACCA003;
+	AdvertiseMeasRR.Pressure = 90;
+	AdvertiseMeasRR.Measurement_Status = IN_RANGE;
+	AdvertiseMeasRR.Temperature = 120;
+	AdvertiseMeasRR.Service_Counter = 0;
+	
+	AdvertiseSensorStatusRR.UID = 0xCACCA003;
+	AdvertiseSensorStatusRR.Location = RIGHT;
+	AdvertiseSensorStatusRR.Axle = REAR;
+	AdvertiseSensorStatusRR.Type = TYPE_UNDEFINED;
+	AdvertiseSensorStatusRR.RSSI = 15;
+	AdvertiseSensorStatusRR.Mute = PSN_ADVERTISING;
+	AdvertiseSensorStatusRR.Battery_Voltage = 200;
+	AdvertiseSensorStatusRR.Service_Counter = 0;
+	
+		
   /* USER CODE END 1 */
   
 
@@ -182,7 +246,60 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance==TIM6)
 	{
-		CAN_send(0x001,1,2,3,4,8);
+		switch (status)
+		{
+			case 0:
+				AdvertiseMeasFL.Service_Counter++;
+				AdvertiseMeasToArray(AdvertiseMeasFL,sendBuffer);
+				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				status = 1;
+			break;
+			case 1:
+				AdvertiseSensorStatusFL.Service_Counter++;
+				AdvertiseSensorStatusToArray(AdvertiseSensorStatusFL,sendBuffer);
+				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				status = 2;
+			break;
+			case 2:
+				AdvertiseMeasFR.Service_Counter++;
+				AdvertiseMeasToArray(AdvertiseMeasFR,sendBuffer);
+				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				status = 3;
+			break;
+			case 3:
+				AdvertiseSensorStatusFR.Service_Counter++;
+				AdvertiseSensorStatusToArray(AdvertiseSensorStatusFR,sendBuffer);
+				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				status = 4;
+			break;
+			case 4:
+				AdvertiseMeasRL.Service_Counter++;
+				AdvertiseMeasToArray(AdvertiseMeasRL,sendBuffer);
+				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				status = 5;
+			break;
+			case 5:
+				AdvertiseSensorStatusRL.Service_Counter++;
+				AdvertiseSensorStatusToArray(AdvertiseSensorStatusRL,sendBuffer);
+				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				status = 6;
+			break;
+			case 6:
+				AdvertiseMeasRR.Service_Counter++;
+				AdvertiseMeasToArray(AdvertiseMeasRR,sendBuffer);
+				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				status = 7;
+			break;
+			case 7:
+				AdvertiseSensorStatusRR.Service_Counter++;
+				AdvertiseSensorStatusToArray(AdvertiseSensorStatusRR,sendBuffer);
+				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				status = 0;
+			break;
+			default:
+				
+			break;
+		}
 		HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
 	}
 }

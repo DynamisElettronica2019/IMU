@@ -151,12 +151,42 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>myAdvertiseMeas,0x0A</ItemText>
+          <ItemText>AdvertiseMeasFL.Service_Counter</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sendBuffer</ItemText>
+          <ItemText>AdvertiseSensorStatusFL.Service_Counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdvertiseMeasFR.Service_Counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdvertiseSensorStatusFR.Service_Counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdvertiseMeasRL.Service_Counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdvertiseSensorStatusRL.Service_Counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdvertiseMeasRR.Service_Counter</ItemText>
+        </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdvertiseSensorStatusRR.Service_Counter</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

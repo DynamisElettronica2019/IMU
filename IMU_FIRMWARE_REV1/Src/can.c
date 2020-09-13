@@ -147,6 +147,37 @@ void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int
   HAL_CAN_AddTxMessage(&hcan1, &header, dataPacket, &mailbox);
 }
 
+void CAN_send_motorola (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
+{
+	uint32_t mailbox;
+
+	header.StdId = ID;
+	header.RTR = CAN_RTR_DATA;
+	header.IDE = CAN_ID_STD;
+	header.DLC = dlc_value;
+
+	HAL_CAN_AddTxMessage(&hcan1, &header, myArray, &mailbox);
+}
+
+void CAN_send_intel (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
+{
+	uint32_t mailbox;
+	uint8_t counter;
+	uint8_t intelArray[8];
+
+	header.StdId = ID;
+	header.RTR = CAN_RTR_DATA;
+	header.IDE = CAN_ID_STD;
+	header.DLC = dlc_value;
+
+	for (counter=0; counter<8; counter++)
+	{
+		intelArray[counter]=myArray[7-counter];
+	}
+
+	HAL_CAN_AddTxMessage(&hcan1, &header, intelArray, &mailbox);
+}
+
 extern void canStart(void)
 {
 	canFilterConfig();
