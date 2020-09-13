@@ -27,7 +27,6 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-#include "BNO085.h"
 #include "id_can.h"
 /* USER CODE END Includes */
 
@@ -44,7 +43,6 @@ void MX_CAN1_Init(void);
 void canStart(void);
 void canSendDebug(void);
 void canFilterConfig(void);
-void canSendIMUPacket(BNO085 *myIMU);
 void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int16_t fourthInt, uint8_t dlc_value);
 /* USER CODE END Prototypes */
 

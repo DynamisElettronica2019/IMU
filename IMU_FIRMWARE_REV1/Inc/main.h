@@ -70,7 +70,6 @@ void Error_Handler(void);
 #define RESET_IMU_Pin GPIO_PIN_8
 #define RESET_IMU_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
-#define IMU_2
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

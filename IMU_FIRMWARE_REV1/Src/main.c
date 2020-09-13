@@ -27,7 +27,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "BNO085.h"
 #include "id_can.h"
 
 /* USER CODE END Includes */
@@ -39,9 +38,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BNO085_ADDRESS 0x94
-#define DEBUG_MODE_OFF
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,9 +48,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-	uint8_t sendCommand=0;
-	BNO085 myIMU;
-	uint8_t readResult=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,46 +96,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	LED_blink();
 	
-	myIMU=BNO085_CreateIMU(&hi2c1, BNO085_ADDRESS, GPIOC, RESET_IMU_Pin, GPIOC, nBOOT_IMU_Pin);
-	BNO085_HardReset(&myIMU);
-	
-	HAL_Delay(250);
-	
-	if (BNO085_IsAlive(&myIMU)==0)
-	{
-		HAL_GPIO_WritePin(GPIOB, LED_DEBUG_2_Pin, GPIO_PIN_SET);
-	}
-	
-	HAL_Delay(50);
-	BNO085_FlushI2C(&myIMU);
-	HAL_Delay(50);
-	BNO085_FlushI2C(&myIMU);
-	HAL_Delay(50);
-	
-	/*Enable sensor reports functions*/
-	BNO085_Command_EnableFullCalibration(&myIMU);
-	BNO085_UpdateSensorReading(&myIMU);
-	HAL_Delay(50);
-	
-	readResult = BNO085_FRS_RequestOrientation(&myIMU);
-	HAL_Delay(50);
-
-	
-	BNO085_EnableAccelerometer (&myIMU, 10);
-	BNO085_EnableGyroscope (&myIMU, 10);
-	BNO085_EnableMagnetometer(&myIMU, 10);
-	BNO085_EnableAbsoluteRotationVector(&myIMU, 10);
-	
-#ifdef DEBUG_MODE_ON
-	BNO085_EnableLinearAcc(&myIMU, 10);
-	BNO085_EnableGravity(&myIMU, 10);
-	BNO085_EnableRelativeRotationVector(&myIMU, 10);
-	BNO085_EnableGeoRotation(&myIMU, 20);
-	BNO085_EnableRawAccelerometer(&myIMU, 10);
-	BNO085_EnableRawGyroscope(&myIMU, 10);
-	BNO085_EnableRawMagnetometer(&myIMU, 10);
-#endif
-
 	canStart();
 	HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
@@ -154,57 +107,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		BNO085_UpdateSensorReading(&myIMU);
-		
-		if (sendCommand!=0)
-		{
-			switch (sendCommand)
-			{
-				case 1:
-					BNO085_Command_EnableFullCalibration(&myIMU);
-				break;
-				case 2:
-					BNO085_Command_DisableFullCalibration(&myIMU);
-				break;
-				case 3:
-					BNO085_Command_TareNow(&myIMU, 0x07, 0x00);
-				break;
-				case 4:
-					BNO085_Command_SetReorientation(&myIMU, 1, 0, 0, 0);
-				break;
-				case 5:
-					BNO085_Command_PersistTare(&myIMU);
-				break;
-				case 6:
-					BNO085_Command_GetOscType(&myIMU);
-				break;
-				case 7:
-					BNO085_Command_Initialize(&myIMU);
-				break;
-				case 8:
-					BNO085_Command_PersistTare(&myIMU);
-				break;
-				case 9:
-					BNO085_Command_ConfigureCalibration(&myIMU, 1, 1, 1, 0);
-				break;
-				case 10:
-					BNO085_Command_ConfigureCalibration(&myIMU, 0, 0, 0, 1);
-				break;
-				case 11:
-					BNO085_Command_SetReorientation(&myIMU, 0, 0, 0, 0);
-				break;
-				case 12:
-					BNO085_Command_SaveDCD(&myIMU);
-				break;
-				case 13:
-					BNO085_Command_ClearResetDCD(&myIMU);
-				break;
-				default:
-					
-				break;
-			}
-			sendCommand=0;
-		}
   }
   /* USER CODE END 3 */
 }
@@ -258,7 +160,6 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance==TIM6)
 	{
-		canSendIMUPacket(&myIMU);
 	}
 }
 
