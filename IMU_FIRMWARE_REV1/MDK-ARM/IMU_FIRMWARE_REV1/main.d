@@ -38,3 +38,4 @@ imu_firmware_rev1\main.o: ../Inc/id_can.h
 imu_firmware_rev1\main.o: ../Inc/i2c.h
 imu_firmware_rev1\main.o: ../Inc/tim.h
 imu_firmware_rev1\main.o: ../Inc/gpio.h
+imu_firmware_rev1\main.o: ../Inc/pirelli_sim.h

@@ -28,6 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "id_can.h"
+#include "pirelli_sim.h"
 
 /* USER CODE END Includes */
 
@@ -48,6 +49,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+advertiseMeasTypedef myAdvertiseMeas;
+advertiseSensorStatusTypedef myAdvertiseSensorStatus;
+uint8_t sendBuffer [8];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,7 +74,24 @@ void LED_blink(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	myAdvertiseMeas.UID = 0xCACCA123;
+	myAdvertiseMeas.Pressure = 100;
+	myAdvertiseMeas.Measurement_Status = OUT_OF_RANGE;
+	myAdvertiseMeas.Temperature = 100;
+	myAdvertiseMeas.Service_Counter = 1;
+	
+	AdvertiseMeasToArray(myAdvertiseMeas,sendBuffer);
+	
+	myAdvertiseSensorStatus.UID = 0xCACCA123;
+	myAdvertiseSensorStatus.Location = RIGHT;
+	myAdvertiseSensorStatus.Axle = REAR;
+	myAdvertiseSensorStatus.Type = TYRE_MIDDLE;
+	myAdvertiseSensorStatus.RSSI = 15;
+	myAdvertiseSensorStatus.Mute = PSN_ADVERTISING;
+	myAdvertiseSensorStatus.Battery_Voltage = 255;
+	myAdvertiseSensorStatus.Service_Counter = 1;
+	
+	AdvertiseSensorStatusToArray(myAdvertiseSensorStatus,sendBuffer);
   /* USER CODE END 1 */
   
 
@@ -95,7 +118,6 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 	LED_blink();
-	
 	canStart();
 	HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
@@ -160,6 +182,8 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance==TIM6)
 	{
+		CAN_send(0x001,1,2,3,4,8);
+		HAL_GPIO_TogglePin(GPIOC, LED_DEBUG_1_Pin);
 	}
 }
 
