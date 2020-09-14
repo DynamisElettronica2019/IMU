@@ -147,7 +147,12 @@ void CAN_send(int ID, int16_t firstInt, int16_t secondInt, int16_t thirdInt, int
   HAL_CAN_AddTxMessage(&hcan1, &header, dataPacket, &mailbox);
 }
 
-void CAN_send_motorola (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
+
+/* Motorola e intel spiegati bene
+big endian.........motorola.........most significant byte smallest memory address
+little endian......intel............least significant byte smallest memory address
+*/
+void CAN_send_intel (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
 {
 	uint32_t mailbox;
 
@@ -159,7 +164,7 @@ void CAN_send_motorola (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
 	HAL_CAN_AddTxMessage(&hcan1, &header, myArray, &mailbox);
 }
 
-void CAN_send_intel (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
+void CAN_send_motorola (uint8_t* myArray, uint16_t ID, uint8_t dlc_value)
 {
 	uint32_t mailbox;
 	uint8_t counter;

@@ -29,6 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "id_can.h"
 #include "pirelli_sim.h"
+#include <stdlib.h> 
 
 /* USER CODE END Includes */
 

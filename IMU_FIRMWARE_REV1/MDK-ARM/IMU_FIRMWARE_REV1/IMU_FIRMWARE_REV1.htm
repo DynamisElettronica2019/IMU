@@ -3,7 +3,7 @@
 <title>Static Call Graph - [IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Sun Sep 13 23:28:54 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Mon Sep 14 10:42:38 2020
 <BR><P>
 <H3>Maximum Stack Usage =        168 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -536,8 +536,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f413xx.o(RESET)
 </UL>
-<P><STRONG><a name="[76]"></a>CAN_send_intel</STRONG> (Thumb, 46 bytes, Stack size 16 bytes, can.o(i.CAN_send_intel))
-<BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<P><STRONG><a name="[76]"></a>CAN_send_intel</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, can.o(i.CAN_send_intel))
+<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_CAN_AddTxMessage
 </UL>
@@ -861,7 +861,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[9e]"></a>HAL_TIM_IRQHandler</STRONG> (Thumb, 358 bytes, Stack size 16 bytes, stm32f4xx_hal_tim.o(i.HAL_TIM_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 <LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_TriggerCallback
@@ -883,7 +883,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a2]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 352 bytes, Stack size 16 bytes, main.o(i.HAL_TIM_PeriodElapsedCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_TogglePin
 <LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CAN_send_intel
@@ -986,7 +986,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f413xx.o(.text)
 </UL>
 <P><STRONG><a name="[40]"></a>TIM6_DAC_IRQHandler</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.TIM6_DAC_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = TIM6_DAC_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = TIM6_DAC_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
