@@ -275,6 +275,8 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 				AdvertiseMeasFL.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasFL,sendBuffer);
 				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				AdvertiseMeasFL.Pressure++;
+				AdvertiseMeasFL.Temperature++;
 				status = 1;
 			break;
 			case 1:
@@ -287,6 +289,8 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 				AdvertiseMeasFR.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasFR,sendBuffer);
 				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				AdvertiseMeasFR.Pressure++;
+				AdvertiseMeasFR.Temperature++;
 				status = 3;
 			break;
 			case 3:
@@ -299,6 +303,8 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 				AdvertiseMeasRL.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasRL,sendBuffer);
 				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				AdvertiseMeasRL.Pressure++;
+				AdvertiseMeasRL.Temperature++;
 				status = 5;
 			break;
 			case 5:
@@ -311,6 +317,8 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 				AdvertiseMeasRR.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasRR,sendBuffer);
 				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				AdvertiseMeasRR.Pressure++;
+				AdvertiseMeasRR.Temperature++;
 				status = 7;
 			break;
 			case 7:
