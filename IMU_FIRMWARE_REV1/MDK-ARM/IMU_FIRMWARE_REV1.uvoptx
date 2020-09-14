@@ -191,12 +191,12 @@
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AdvertiseMeasRL,0x0A</ItemText>
+          <ItemText>AdvertiseMeasRR,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AdvertiseSensorStatusRL,0x0A</ItemText>
+          <ItemText>AdvertiseSensorStatusRR,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

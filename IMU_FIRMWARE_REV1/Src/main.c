@@ -90,7 +90,29 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	
+	//Note: inserire il valore che si intende inviare, gli offset vengono applicati dalla funzione di conversione da struct ad array
+	
+	/*advertiseMeasTypedef:							//Range accettabili:
+
+	uint32_t UID;												//Da 0 a 0xFFFFFFFF
+	uint16_t Pressure;									//Da 0 a 2047
+	statusTypedef Measurement_Status;		//Vedi typedef status
+	int16_t Temperature;								//Da -78 a 177
+	uint8_t Service_Counter;						//Da 0 a 255 ciclico
+
+	advertiseSensorStatusTypedef:				//Range accettabili:
+
+	uint32_t UID;												//Da 0 a 0xFFFFFFFF
+	locationTypedef Location;						//Vedi typedef Location
+	axleTypedef Axle;										//Vedi typedef axle
+	typeTypedef Type;										//Vedi typedef type
+	int8_t RSSI;												//Da -127 a 0
+	muteTypedef Mute;										//Vedi typedef mute
+	uint16_t Battery_Voltage;						//Da 100 a 355		
+	uint8_t Service_Counter;						//Da 0 a 255 ciclico*/
+	
 	//Inizializzazione front left
+	
 	AdvertiseMeasFL.UID = 0xCACCA000;
 	AdvertiseMeasFL.Pressure = 100;
 	AdvertiseMeasFL.Measurement_Status = IN_RANGE;
@@ -101,7 +123,7 @@ int main(void)
 	AdvertiseSensorStatusFL.Location = LEFT;
 	AdvertiseSensorStatusFL.Axle = FRONT;
 	AdvertiseSensorStatusFL.Type = TYPE_UNDEFINED;
-	AdvertiseSensorStatusFL.RSSI = 15;
+	AdvertiseSensorStatusFL.RSSI = -15;
 	AdvertiseSensorStatusFL.Mute = PSN_ADVERTISING;
 	AdvertiseSensorStatusFL.Battery_Voltage = 255;
 	AdvertiseSensorStatusFL.Service_Counter = 0;
@@ -117,7 +139,7 @@ int main(void)
 	AdvertiseSensorStatusFR.Location = RIGHT;
 	AdvertiseSensorStatusFR.Axle = FRONT;
 	AdvertiseSensorStatusFR.Type = TYPE_UNDEFINED;
-	AdvertiseSensorStatusFR.RSSI = 15;
+	AdvertiseSensorStatusFR.RSSI = -16;
 	AdvertiseSensorStatusFR.Mute = PSN_ADVERTISING;
 	AdvertiseSensorStatusFR.Battery_Voltage = 250;
 	AdvertiseSensorStatusFR.Service_Counter = 0;
@@ -134,7 +156,7 @@ int main(void)
 	AdvertiseSensorStatusRL.Location = LEFT;
 	AdvertiseSensorStatusRL.Axle = REAR;
 	AdvertiseSensorStatusRL.Type = TYPE_UNDEFINED;
-	AdvertiseSensorStatusRL.RSSI = 15;
+	AdvertiseSensorStatusRL.RSSI = -17;
 	AdvertiseSensorStatusRL.Mute = PSN_ADVERTISING;
 	AdvertiseSensorStatusRL.Battery_Voltage = 200;
 	AdvertiseSensorStatusRL.Service_Counter = 0;
@@ -151,7 +173,7 @@ int main(void)
 	AdvertiseSensorStatusRR.Location = RIGHT;
 	AdvertiseSensorStatusRR.Axle = REAR;
 	AdvertiseSensorStatusRR.Type = TYPE_UNDEFINED;
-	AdvertiseSensorStatusRR.RSSI = 15;
+	AdvertiseSensorStatusRR.RSSI = -18;
 	AdvertiseSensorStatusRR.Mute = PSN_ADVERTISING;
 	AdvertiseSensorStatusRR.Battery_Voltage = 200;
 	AdvertiseSensorStatusRR.Service_Counter = 0;

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image IMU_FIRMWARE_REV1\IMU_FIRMWARE_REV1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Mon Sep 14 10:42:38 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Mon Sep 14 11:18:06 2020
 <BR><P>
 <H3>Maximum Stack Usage =        168 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -489,14 +489,14 @@ Global Symbols
 
 <P><STRONG><a name="[c3]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
 
-<P><STRONG><a name="[a6]"></a>AdvertiseMeasToArray</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, pirelli_sim.o(i.AdvertiseMeasToArray))
+<P><STRONG><a name="[a6]"></a>AdvertiseMeasToArray</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, pirelli_sim.o(i.AdvertiseMeasToArray))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = AdvertiseMeasToArray
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 </UL>
 
-<P><STRONG><a name="[a7]"></a>AdvertiseSensorStatusToArray</STRONG> (Thumb, 58 bytes, Stack size 8 bytes, pirelli_sim.o(i.AdvertiseSensorStatusToArray))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = AdvertiseSensorStatusToArray
+<P><STRONG><a name="[a7]"></a>AdvertiseSensorStatusToArray</STRONG> (Thumb, 62 bytes, Stack size 12 bytes, pirelli_sim.o(i.AdvertiseSensorStatusToArray))
+<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = AdvertiseSensorStatusToArray
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 </UL>
@@ -861,7 +861,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[9e]"></a>HAL_TIM_IRQHandler</STRONG> (Thumb, 358 bytes, Stack size 16 bytes, stm32f4xx_hal_tim.o(i.HAL_TIM_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 <LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_TriggerCallback
@@ -882,8 +882,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
 
-<P><STRONG><a name="[a2]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 352 bytes, Stack size 16 bytes, main.o(i.HAL_TIM_PeriodElapsedCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<P><STRONG><a name="[a2]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 348 bytes, Stack size 24 bytes, main.o(i.HAL_TIM_PeriodElapsedCallback))
+<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_TogglePin
 <LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CAN_send_intel
@@ -976,8 +976,8 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = SystemClock_Config &rArr; HAL_RCC_ClockConfig &rArr; HAL_RCC_GetSysClockFreq &rArr; __aeabi_uldivmod
 </UL>
 <BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_ClockConfig
-<LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr4
+<LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 </UL>
 <BR>[Called By]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -986,7 +986,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f413xx.o(.text)
 </UL>
 <P><STRONG><a name="[40]"></a>TIM6_DAC_IRQHandler</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.TIM6_DAC_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = TIM6_DAC_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
+<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = TIM6_DAC_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; CAN_send_intel &rArr; HAL_CAN_AddTxMessage
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
@@ -1021,7 +1021,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[69]"></a>main</STRONG> (Thumb, 220 bytes, Stack size 0 bytes, main.o(i.main))
+<P><STRONG><a name="[69]"></a>main</STRONG> (Thumb, 216 bytes, Stack size 0 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = main &rArr; SystemClock_Config &rArr; HAL_RCC_ClockConfig &rArr; HAL_RCC_GetSysClockFreq &rArr; __aeabi_uldivmod
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;canStart

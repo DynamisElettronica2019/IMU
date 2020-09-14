@@ -12,7 +12,7 @@ uint8_t* AdvertiseMeasToArray(advertiseMeasTypedef myAdvertiseMeas, uint8_t* myA
 
 	myArray[4] = myAdvertiseMeas.Pressure & 0xFF;
 	myArray[5] = ((myAdvertiseMeas.Pressure>>8) & 0x07) | ((myAdvertiseMeas.Measurement_Status&0x01)<<7);
-	myArray[6] = myAdvertiseMeas.Temperature;
+	myArray[6] = (myAdvertiseMeas.Temperature-50)&0xFF;
 	myArray[7] = myAdvertiseMeas.Service_Counter;
 
 	return myArray;
@@ -26,8 +26,8 @@ uint8_t* AdvertiseSensorStatusToArray(advertiseSensorStatusTypedef myAdvertiseSe
 	myArray[3] = (myAdvertiseSensorStatus.UID>>24) & 0xFF;
 
 	myArray[4] = (myAdvertiseSensorStatus.Location & 0x03) | ((myAdvertiseSensorStatus.Axle & 0x07)<<2) | ((myAdvertiseSensorStatus.Type & 0x07)<<5);
-	myArray[5] = (myAdvertiseSensorStatus.RSSI & 0x7F) | ((myAdvertiseSensorStatus.Mute & 0x01)<<7);
-	myArray[6] = myAdvertiseSensorStatus.Battery_Voltage;
+	myArray[5] = ((myAdvertiseSensorStatus.RSSI+63) & 0x7F) | ((myAdvertiseSensorStatus.Mute & 0x01)<<7);
+	myArray[6] = (myAdvertiseSensorStatus.Battery_Voltage-100)&0xFF;
 	myArray[7] = myAdvertiseSensorStatus.Service_Counter;
 
 	return myArray;

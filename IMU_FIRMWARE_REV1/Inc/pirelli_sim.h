@@ -30,25 +30,25 @@ typedef enum
 	PSN_MUTE, PSN_ADVERTISING
 }muteTypedef;
 
-typedef struct
+typedef struct												//Range accettabili:
 {
-	uint32_t UID;
-	uint16_t Pressure;					//Usati solo 11 bit
-	statusTypedef Measurement_Status;
-	int8_t Temperature; 				//Inviata con offset di 50°C
-	uint8_t Service_Counter;
+	uint32_t UID;												//Da 0 a 0xFFFFFFFF
+	uint16_t Pressure;									//Da 0 a 2047
+	statusTypedef Measurement_Status;		//Vedi typedef status
+	int16_t Temperature;								//Da -78 a 177
+	uint8_t Service_Counter;						//Da 0 a 255 ciclico
 }advertiseMeasTypedef;
 
-typedef struct
+typedef struct												//Range accettabili:
 {
-	uint32_t UID;
-	locationTypedef Location;
-	axleTypedef Axle;
-	typeTypedef Type;
-	int8_t RSSI;
-	muteTypedef Mute;
-	uint8_t Battery_Voltage;		//Inviata con offset di 100 (centesimi di volt?)
-	uint8_t Service_Counter;
+	uint32_t UID;												//Da 0 a 0xFFFFFFFF
+	locationTypedef Location;						//Vedi typedef Location
+	axleTypedef Axle;										//Vedi typedef axle
+	typeTypedef Type;										//Vedi typedef type
+	int8_t RSSI;												//Da -127 a 0
+	muteTypedef Mute;										//Vedi typedef mute
+	uint16_t Battery_Voltage;						//Da 100 a 355		
+	uint8_t Service_Counter;						//Da 0 a 255 ciclico
 }advertiseSensorStatusTypedef;
 
 /*Function prototypes*/
