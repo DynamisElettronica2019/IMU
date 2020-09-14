@@ -35,7 +35,10 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum
+{
+	false, true
+}bool;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -68,6 +71,8 @@ advertiseSensorStatusTypedef AdvertiseSensorStatusRR;
 
 uint8_t sendBuffer [8];
 uint8_t status=0;
+
+bool useErrors = true;
 
 /* USER CODE END PV */
 
@@ -273,6 +278,8 @@ void SystemClock_Config(void)
 
 void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 {
+	uint32_t error_number;
+	HAL_RNG_GenerateRandomNumber(&hrng, &error_number);
 	if (htim->Instance==TIM6)
 	{
 		switch (status)
@@ -280,7 +287,14 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 			case 0:
 				AdvertiseMeasFL.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasFL,sendBuffer);
-				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}	
 				AdvertiseMeasFL.Pressure++;
 				AdvertiseMeasFL.Temperature++;
 				status = 1;
@@ -288,13 +302,27 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 			case 1:
 				AdvertiseSensorStatusFL.Service_Counter++;
 				AdvertiseSensorStatusToArray(AdvertiseSensorStatusFL,sendBuffer);
-				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}
 				status = 2;
 			break;
 			case 2:
 				AdvertiseMeasFR.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasFR,sendBuffer);
-				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}	
 				AdvertiseMeasFR.Pressure++;
 				AdvertiseMeasFR.Temperature++;
 				status = 3;
@@ -302,13 +330,27 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 			case 3:
 				AdvertiseSensorStatusFR.Service_Counter++;
 				AdvertiseSensorStatusToArray(AdvertiseSensorStatusFR,sendBuffer);
-				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}				
 				status = 4;
 			break;
 			case 4:
 				AdvertiseMeasRL.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasRL,sendBuffer);
-				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}	
 				AdvertiseMeasRL.Pressure++;
 				AdvertiseMeasRL.Temperature++;
 				status = 5;
@@ -316,13 +358,27 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 			case 5:
 				AdvertiseSensorStatusRL.Service_Counter++;
 				AdvertiseSensorStatusToArray(AdvertiseSensorStatusRL,sendBuffer);
-				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}				
 				status = 6;
 			break;
 			case 6:
 				AdvertiseMeasRR.Service_Counter++;
 				AdvertiseMeasToArray(AdvertiseMeasRR,sendBuffer);
-				CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, MEAS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}	
 				AdvertiseMeasRR.Pressure++;
 				AdvertiseMeasRR.Temperature++;
 				status = 7;
@@ -330,7 +386,14 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim)
 			case 7:
 				AdvertiseSensorStatusRR.Service_Counter++;
 				AdvertiseSensorStatusToArray(AdvertiseSensorStatusRR,sendBuffer);
-				CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				if (useErrors == false || error_number%7!=0)
+				{
+					CAN_send_intel(sendBuffer, STATUS_ID, 8);
+				}
+				else
+				{
+					HAL_GPIO_TogglePin(GPIOB, LED_DEBUG_3_Pin);
+				}				
 				status = 0;
 			break;
 			default:
